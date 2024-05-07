@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 #region Select
@@ -143,6 +144,37 @@ int FindMax(List<int> array)
 }
 #endregion
 
+#region Stairs
+void Stairs(List<int> array)
+{
+    int summa = 0;
+    List<int> path = [];
+    StairsF(array, array.Count - 1, path);
+    Console.WriteLine("Путь: ");
+    foreach(int item in path)
+    {
+        summa += array[item];
+        Console.Write($"{item} ");
+    }
+    Console.WriteLine($"\nСумма: {summa}"); 
+}
+
+int StairsF(List<int> array, int number, List<int> path)
+{
+    Console.WriteLine($"number = {number}, array[number] = {array[number]}");
+    path.Add(number);
+    if (number == 0)
+    {
+        return 0;
+    }
+    if (number == 1)
+    {
+        return array[1];
+    }
+    return array[number] + Math.Max(StairsF(array, number - 1, path), StairsF(array, number - 2, path));
+}
+#endregion
+
 static void PrintArray(List<int> array)
 {
     Console.ForegroundColor = ConsoleColor.Red;
@@ -166,18 +198,23 @@ while (true)
     switch (choice)
     {
         case 1: 
-            Console.WriteLine("Выбран SelectSort");   
+            Console.WriteLine("SelectSort");   
             DoMethod(() => SelectSort(array)); 
             break;
 
         case 2:
-            Console.WriteLine("Выбран BubbleSort");
+            Console.WriteLine("BubbleSort");
             DoMethod(() => BubbleSort(array));
             break;
 
         case 3:
-            Console.WriteLine("Выбран MergeSort");
+            Console.WriteLine("MergeSort");
             DoMethod(() => MergeSort(array));
+            break;
+
+        case 4:
+            Console.WriteLine("Лестница");
+            DoMethod(() => Stairs(array));
             break;
 
         case 0: return;
