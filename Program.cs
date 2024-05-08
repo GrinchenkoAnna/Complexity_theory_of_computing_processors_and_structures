@@ -1,8 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
-#region Select
+﻿#region Select
 void SelectSort(List<int> array)
 {
     int comparision = 0, permutation = 0;
@@ -147,31 +143,25 @@ int FindMax(List<int> array)
 #region Stairs
 void Stairs(List<int> array)
 {
-    int summa = 0;
-    List<int> path = [];
-    StairsF(array, array.Count - 1, path);
-    Console.WriteLine("Путь: ");
-    foreach(int item in path)
-    {
-        summa += array[item];
-        Console.Write($"{item} ");
-    }
-    Console.WriteLine($"\nСумма: {summa}"); 
-}
+    List<int> summa = [], path = [];
 
-int StairsF(List<int> array, int number, List<int> path)
-{
-    Console.WriteLine($"number = {number}, array[number] = {array[number]}");
-    path.Add(number);
-    if (number == 0)
+    summa.Add(array[0]);
+    summa.Add(array[1] + summa[0]);
+    for (int i = 2; i < array.Count; i++) summa.Add(array[i] + Math.Max(summa[i - 1], summa[i - 2]));
+
+    path.Add(array.Count);
+    for (int i = array.Count; i - 2 >= 0;)
     {
-        return 0;
+        int step = Math.Max(summa[i - 1], summa[i - 2]); 
+        i = summa.LastIndexOf(step, i - 1);
+        path.Add(i);
+        if (i == 1 && summa[1] + summa[0] >= summa[1]) path.Add(0);
     }
-    if (number == 1)
-    {
-        return array[1];
-    }
-    return array[number] + Math.Max(StairsF(array, number - 1, path), StairsF(array, number - 2, path));
+    path.Reverse();
+
+    Console.WriteLine("Путь: ");
+    PrintPath(array, path);
+    Console.WriteLine($"Сумма: {summa.Last<int>()}"); 
 }
 #endregion
 
@@ -179,6 +169,22 @@ static void PrintArray(List<int> array)
 {
     Console.ForegroundColor = ConsoleColor.Red;
     foreach (int item in array) Console.Write($"{item} ");
+    Console.ResetColor();
+    Console.WriteLine();
+}
+
+static void PrintPath(List<int> array, List<int> index)
+{
+    for (int i = 0, j = 0; i < array.Count && j < index.Count; i++)
+    {
+        if (i == index[j])
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            j++;
+        }
+        else Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write($"{array[i]} ");
+    }
     Console.ResetColor();
     Console.WriteLine();
 }
@@ -192,32 +198,32 @@ while (true)
 {
     Console.Clear();
     Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\nВыбор пункта: ");
-    int choice = Convert.ToInt16(Console.ReadLine());
+    string choice = Console.ReadLine();
     Console.WriteLine();
 
     switch (choice)
     {
-        case 1: 
-            Console.WriteLine("SelectSort");   
+        case "1":
+            Console.WriteLine("SelectSort");
             DoMethod(() => SelectSort(array)); 
             break;
 
-        case 2:
+        case "2":
             Console.WriteLine("BubbleSort");
             DoMethod(() => BubbleSort(array));
             break;
 
-        case 3:
+        case "3":
             Console.WriteLine("MergeSort");
             DoMethod(() => MergeSort(array));
             break;
 
-        case 4:
+        case "4":
             Console.WriteLine("Лестница");
             DoMethod(() => Stairs(array));
             break;
 
-        case 0: return;
+        case "0": return;
 
         default: break;
     }
@@ -229,9 +235,15 @@ void DoMethod(Action method)
     Console.Write("Введите N: ");
     N = Convert.ToInt16(Console.ReadLine());
     Random random = new();
-    for (int i = 0; i < N; i++) array.Add(random.Next(0, 20));
+    for (int i = 0; i < N; i++) array.Add(random.Next(-10, -10));
+    //array.Add(2);
+    //array.Add(-3);
+    //array.Add(-8);
+    //array.Add(-4);
+    //array.Add(5);
+    //array.Add(6);
 
     PrintArray(array);
-    method();
+    if (array.Count >= 2) method(); 
     Console.ReadKey();
 }
