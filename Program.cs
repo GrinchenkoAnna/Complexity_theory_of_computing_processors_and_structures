@@ -1,158 +1,161 @@
-﻿int N = 0, M = 1;
+﻿using System.IO;
 
-//#region Select
-//void SelectSort(List<int> array)
-//{
-//    int comparision = 0, permutation = 0;
+int N = 0, M = 1;
 
-//    for (int i = 0; i < array.Count; i++)
-//    {
-//        int min = i;
-//        for (int j = i + 1; j < array.Count; j++)
-//        {
-//            if (array[j] < array[min]) min = j;
-//            comparision++;
-//        }
-//        (array[i], array[min]) = (array[min], array[i]);
-//        permutation++;
-//    }
+#region Select
+void SelectSort(int[] array)
+{
+    int comparision = 0, permutation = 0;
 
-//    Console.WriteLine("\u2193");
-//    PrintArray(array);
+    for (int i = 0; i < array.Length; i++)
+    {
+        int min = i;
+        for (int j = i + 1; j < array.Length; j++)
+        {
+            if (array[j] < array[min]) min = j;
+            comparision++;
+        }
+        (array[i], array[min]) = (array[min], array[i]);
+        permutation++;
+    }
 
-//    Console.WriteLine($"Теоретическая трудоемкость алгоритма: 1/2*N^2 = {Math.Ceiling((double)(Math.Pow(array.Count, 2)) / 2)}");
-//    Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
-//}
-//#endregion
+    Console.WriteLine("\u2193");
+    Print1DArray(array);
 
-//#region Bubble
-//void BubbleSort(List<int> array)
-//{
-//    int comparision = 0, permutation = 0;
+    Console.WriteLine($"Теоретическая трудоемкость алгоритма: 1/2*N^2 = {Math.Ceiling((double)(Math.Pow(array.Length, 2)) / 2)}");
+    Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
+}
+#endregion
 
-//    for (int i = 0; i < array.Count; i++)
-//    {
-//        for (int j = 0; j < array.Count - 1 - i; j++)
-//        {
-//            if (array[j] > array[j + 1])
-//            {
-//                (array[j], array[j + 1]) = (array[j + 1], array[j]);
-//                permutation++;
-//            }
-//            comparision++;   
-//        }
-//    }
+#region Bubble
+void BubbleSort(int[] array)
+{
+    int comparision = 0, permutation = 0;
 
-//    Console.WriteLine("\u2193");
-//    PrintArray(array);
+    for (int i = 0; i < array.Length; i++)
+    {
+        for (int j = 0; j < array.Length - 1 - i; j++)
+        {
+            if (array[j] > array[j + 1])
+            {
+                (array[j], array[j + 1]) = (array[j + 1], array[j]);
+                permutation++;
+            }
+            comparision++;
+        }
+    }
 
-//    Console.WriteLine($"Теоретическая трудоемкость алгоритма: N^2 = {Math.Pow(array.Count, 2)}");
-//    Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
-//}
-//#endregion
+    Console.WriteLine("\u2193");
+    Print1DArray(array);
 
-//#region Merge
-//void MergeSort(List<int> array)
-//{
-//    int comparision = 0, permutation = 0;
-//    int delete = CheckN(array);
-//    Sort(array, 0, array.Count - 1, ref comparision, ref permutation);
+    Console.WriteLine($"Теоретическая трудоемкость алгоритма: N^2 = {Math.Pow(array.Length, 2)}");
+    Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
+}
+#endregion
 
-//    Console.WriteLine("\u2193");
-//    PrintArray(array);
-//    if (delete != 0)
-//    {
-//        Console.WriteLine("Удаление лишних элементов:");
-//        for (int i = array.Count - 1; delete > 0; i--, delete--) array.Remove(array[i]);
-//        PrintArray(array);
-//    }
+#region Merge
+void MergeSort(int[] array)
+{
+    int comparision = 0, permutation = 0;
+    int delete = CheckN(ref array);
+    Console.WriteLine($"delete = {delete}");
+    Sort(array, 0, array.Length - 1, ref comparision, ref permutation);
 
-//    Console.WriteLine($"Теоретическая трудоемкость алгоритма: N*logN = {array.Count * Math.Ceiling(Math.Log2(array.Count))}");
-//    Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
-//}
-//void Sort(List<int> array, int left, int right, ref int comparision, ref int permutation)
-//{
-    
-//    if (left < right)
-//    {
-//        comparision++;
+    Console.WriteLine("\u2193");
+    Print1DArray(array);
+    if (delete != 0)
+    {
+        Console.WriteLine("Удаление лишних элементов:");
+        Array.Resize<int>(ref array, array.Length - delete);
+        Print1DArray(array);
+    }
 
-//        int middle = left + (right - left) / 2;
-//        Sort(array, left, middle, ref comparision, ref permutation);
-//        Sort(array, middle + 1, right, ref comparision, ref permutation);
-//        Merge(array, left, middle, right, comparision, permutation);
+    Console.WriteLine($"Теоретическая трудоемкость алгоритма: N*logN = {array.Length * Math.Ceiling(Math.Log2(array.Length))}");
+    Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
+}
+void Sort(int[] array, int left, int right, ref int comparision, ref int permutation)
+{
 
-//        permutation++;
-//    }
-//}
-//void Merge(List<int> array, int left, int middle, int right, int comparision, int permutation)
-//{
-//    int size1 = middle - left + 1;
-//    int size2 = right - middle;
-//    int i = 0, j = 0;
+    if (left < right)
+    {
+        comparision++;
 
-//    List<int> tempLeft = [];
-//    List<int> tempRight = [];
-    
-//    for (i = 0; i < size1; i++) tempLeft.Add(array[left + i]);
-//    for (j = 0; j < size2; j++) tempRight.Add(array[middle + 1 + j]);
+        int middle = left + (right - left) / 2;
+        Sort(array, left, middle, ref comparision, ref permutation);
+        Sort(array, middle + 1, right, ref comparision, ref permutation);
+        Merge(array, left, middle, right, comparision, permutation);
 
-//    i = 0; j = 0;
-//    int k = left;
+        permutation++;
+    }
+}
+void Merge(int[] array, int left, int middle, int right, int comparision, int permutation)
+{
+    int size1 = middle - left + 1;
+    int size2 = right - middle;
+    int i = 0, j = 0;
 
-//    while (i < size1 && j < size2)
-//    {
-//        if (tempLeft[i] <= tempRight[j]) { array[k] = tempLeft[i]; i++; permutation++; }
-//        else { array[k] = tempRight[j]; j++; permutation++; }
-//        k++; comparision++;
-//    }
-//    while (i < size1) { array[k] = tempLeft[i]; i++; k++; permutation++; }
-//    while (j < size2) { array[k] = tempRight[j]; j++; k++; permutation++; }
-//}
-//int CheckN(List<int> array)
-//{
-//    for (int i = 1; ; i++)
-//    {
-//        if (array.Count == Math.Pow(2, i))
-//        {
-//            Console.WriteLine($"Число элементов в массиве = {array.Count} = 2^k, добавлять элементы не требуется");
-//            return 0;
-//        }
-//        else if (array.Count < Math.Pow(2, i))
-//        {
-//            int to_add = (int)Math.Pow(2, i) - array.Count;
-//            Console.WriteLine($"Число элементов в массиве = {array.Count} != 2^k, необходимо добавить {to_add}");
-//            int M = FindMax(array);
-//            for (int j = 1; j <= to_add; j++) array.Add(M + j);
-//            Console.WriteLine("Результат:");
-//            PrintArray(array);
+    List<int> tempLeft = [];
+    List<int> tempRight = [];
 
-//            return to_add;
-//        }
-//    }
-//}
-//int FindMax(List<int> array)
-//{
-//    int max = array[0];
-//    for (int i = 0; i < array.Count; i++)
-//    {
-//        if (array[i] > max) max = array[i];
-//    }
-//    return max;
-//}
-//#endregion
+    for (i = 0; i < size1; i++) tempLeft.Add(array[left + i]);
+    for (j = 0; j < size2; j++) tempRight.Add(array[middle + 1 + j]);
+
+    i = 0; j = 0;
+    int k = left;
+
+    while (i < size1 && j < size2)
+    {
+        if (tempLeft[i] <= tempRight[j]) { array[k] = tempLeft[i]; i++; permutation++; }
+        else { array[k] = tempRight[j]; j++; permutation++; }
+        k++; comparision++;
+    }
+    while (i < size1) { array[k] = tempLeft[i]; i++; k++; permutation++; }
+    while (j < size2) { array[k] = tempRight[j]; j++; k++; permutation++; }
+}
+int CheckN(ref int[] array)
+{
+    for (int i = 1; ; i++)
+    {
+        if (array.Length == Math.Pow(2, i))
+        {
+            Console.WriteLine($"Число элементов в массиве = {array.Length} = 2^k, добавлять элементы не требуется");
+            return 0;
+        }
+        else if (array.Length < Math.Pow(2, i))
+        {
+            int to_add = (int)Math.Pow(2, i) - array.Length;
+            int prev_length = array.Length;
+            Console.WriteLine($"Число элементов в массиве = {array.Length} != 2^k, необходимо добавить {to_add}");
+            int M = FindMax(array);
+            Array.Resize<int>(ref array, array.Length + to_add);
+            for (int j = 1; j <= to_add; j++) array[prev_length - 1 + j] = M + j; 
+            Console.WriteLine("Результат:");
+            Print1DArray(array);
+
+            return to_add;
+        }
+    }
+}
+int FindMax(int[] array)
+{
+    int max = array[0];
+    for (int i = 0; i < array.Length; i++)
+    {
+        if (array[i] > max) max = array[i];
+    }
+    return max;
+}
+#endregion
 
 #region Stairs
-void Stairs(int[,] array)
+void Stairs(int[] array)
 {
-    int[] temp_array = new int[N];
-    for (int i = 0; i < N; i++) temp_array[i] = array[0, i];
     int[] summa = new int[N];
     int[] path = new int[N];
 
-    summa[0] = temp_array[0];
-    summa[1] = Math.Max(temp_array[1] + summa[0], temp_array[1]);
-    for (int i = 2; i < N; i++) summa[i] = temp_array[i] + Math.Max(summa[i - 1], summa[i - 2]);
+    summa[0] = array[0];
+    summa[1] = Math.Max(array[1] + summa[0], array[1]);
+    for (int i = 2; i < N; i++) summa[i] = array[i] + Math.Max(summa[i - 1], summa[i - 2]);
 
     path[0] = N - 1;
     int path_index = 1;
@@ -168,18 +171,26 @@ void Stairs(int[,] array)
     Array.Reverse(path);
 
     Console.WriteLine("Путь: ");
-    PrintPath(array, path);
+    PrintPath_1DArray(array, path);
     Console.WriteLine($"Сумма: {summa[N - 1]}");
 }
 #endregion
 
 #region ChessBoard
-void ChessBoard(int[,] array)
+void ChessBoard(int[] array)
 {
     
 }
 #endregion
-void PrintArray(int[,] array)
+void Print1DArray(int[] array)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    for (int i = 0; i < array.Length; i++) Console.Write($"{array[i]} ");
+    Console.ResetColor();
+    Console.WriteLine();
+}
+
+void Print2DArray(int[,] array)
 {
     Console.ForegroundColor = ConsoleColor.Red;
     for (int i = 0; i < M; i++)
@@ -188,9 +199,26 @@ void PrintArray(int[,] array)
         Console.WriteLine();
     }
     Console.ResetColor();
+    Console.WriteLine();
 }
 
-void PrintPath(int[,] array, int[] path)
+void PrintPath_1DArray(int[] array, int[] path)
+{
+    for (int i = 0, k = 0; i < array.Length; i++)
+    {
+        if (i == path[k])
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            k++;
+        }
+        else Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write($"{array[i]} ");
+    }
+    Console.ResetColor();
+    Console.WriteLine();
+}
+
+void PrintPath_2DArray(int[,] array, int[] path)
 {
     for (int i = 0, j = 0, k = 0; i < M && j < N; j++)
     {
@@ -207,8 +235,8 @@ void PrintPath(int[,] array, int[] path)
     Console.WriteLine();
 }
 
-int[,] array = new int [0, 0];
-//List<int> array = [];
+int[,] array_2d = new int[0, 0];
+int[] array_1d = [];
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 while (true) 
@@ -220,29 +248,29 @@ while (true)
 
     switch (choice)
     {
-        //case "1":
-        //    Console.WriteLine("SelectSort");
-        //    DoMethod(1, () => SelectSort(array)); 
-        //    break;
+        case "1":
+            Console.WriteLine("SelectSort");
+            PrepareMethod(1, () => SelectSort(array_1d));
+            break;
 
-        //case "2":
-        //    Console.WriteLine("BubbleSort");
-        //    DoMethod(1, () => BubbleSort(array));
-        //    break;
+        case "2":
+            Console.WriteLine("BubbleSort");
+            PrepareMethod(1, () => BubbleSort(array_1d));
+            break;
 
-        //case "3":
-        //    Console.WriteLine("MergeSort");
-        //    DoMethod(1, () => MergeSort(array));
-        //    break;
+        case "3":
+            Console.WriteLine("MergeSort");
+            PrepareMethod(1, () => MergeSort(array_1d));
+            break;
 
         case "4":
             Console.WriteLine("Лестница");
-            DoMethod(1, () => Stairs(array));
+            PrepareMethod(1, () => Stairs(array_1d));
             break;
 
         case "5":
             Console.WriteLine("Шахматная доска");
-            DoMethod(2, () => ChessBoard(array));
+            PrepareMethod(2, () => ChessBoard(array_1d));
             break;
 
         case "0": return;
@@ -251,25 +279,37 @@ while (true)
     }
 }
 
-void DoMethod(int dimension, Action method)
+void PrepareMethod(int dimension, Action method)
 {
-    Array.Clear(array); N = 0; M = 1;
+    N = 0; M = 1;
     Random random = new();
     if (dimension > 1)
     {
         Console.Write("Введите M: ");
         M = Convert.ToInt16(Console.ReadLine());
     }
-
     Console.Write("Введите N: ");
     N = Convert.ToInt16(Console.ReadLine());
-    array = new int[M, N];
-    for (int i = 0; i < M; i++)
-    {
-        for (int j = 0; j < N; j++) array[i, j] = random.Next(-10, 10);
-    }
 
-    PrintArray(array);
-    if (array.Length >= 2) method(); 
+    if (dimension > 1)
+    {
+        Array.Clear(array_2d);
+        array_2d = new int[M, N];
+        for (int i = 0; i < M; i++)
+        {
+            for (int j = 0; j < N; j++) array_2d[i, j] = random.Next(-10, 10);
+        }
+        Print2DArray(array_2d);
+        if (array_2d.Length >= 2) method();
+    }
+    else
+    {
+        Array.Clear(array_1d);
+        array_1d = new int[N];
+        for (int i = 0; i < N; i++) array_1d[i] = random.Next(-10, 10);
+        Print1DArray(array_1d);
+        if (array_1d.Length >= 2) method();
+    }
+    
     Console.ReadKey();
 }
