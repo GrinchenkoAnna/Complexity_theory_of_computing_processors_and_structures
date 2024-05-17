@@ -156,20 +156,18 @@ void Stairs(int[,] array)
 
     path[0] = N - 1;
     int path_index = 1;
-    for (int i = N; i - 2 >= 0;)
+    for (int i = N - 1; i - 2 >= 0;)
     {
-        int step = Math.Max(summa[i - 1], summa[i - 2]); 
+        int step = Math.Max(summa[i - 1], summa[i - 2]);
         i = Array.LastIndexOf(summa, step, i - 1);
         path[path_index] = i;
         path_index++;
-        if (i == 1 && summa[0] > 0) path[path_index] = 0;
+        if (i == 1 && summa[0] > 0) path[path_index] = 0;            
     }
     Array.Resize<int>(ref path, path_index);
     Array.Reverse(path);
 
     Console.WriteLine("Путь: ");
-    for (int i = 0; i < path.Length; i++) Console.Write($"{path[i]} ");
-    Console.WriteLine();
     PrintPath(array, path);
     Console.WriteLine($"Сумма: {summa[N - 1]}");
 }
@@ -190,7 +188,6 @@ void PrintArray(int[,] array)
         Console.WriteLine();
     }
     Console.ResetColor();
-    Console.WriteLine();
 }
 
 void PrintPath(int[,] array, int[] path)
@@ -204,7 +201,7 @@ void PrintPath(int[,] array, int[] path)
         }
         else Console.ForegroundColor = ConsoleColor.Red;
         Console.Write($"{array[i, j]} ");
-        if (j == N) j = 0; i++;
+        if (j == N) { j = 0; i++; }
     }
     Console.ResetColor();
     Console.WriteLine();
