@@ -1,6 +1,8 @@
 ﻿using System.IO;
+using System.Runtime.InteropServices;
 
 int N = 0, M = 1;
+const int output_width = 5;
 
 #region Select
 void SelectSort(int[] array)
@@ -167,7 +169,7 @@ void Stairs(int[] array)
         path_index++;
         if (i == 1 && summa[0] > 0) path[path_index] = 0;            
     }
-    Array.Resize<int>(ref path, path_index);
+    Array.Resize(ref path, path_index);
     Array.Reverse(path);
 
     Console.WriteLine("Путь: ");
@@ -177,15 +179,55 @@ void Stairs(int[] array)
 #endregion
 
 #region ChessBoard
-void ChessBoard(int[] array)
+void ChessBoard(int[,] array)
 {
+    int[,] summa = new int[M, N]; 
+    Path[] path = new Path[M + N - 1];
     
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            if (i > 0 && j > 0) summa[i, j] = array[i, j] + Math.Max(summa[i, j - 1], summa[i - 1, j]);
+            else if (i > 0 && j == 0) summa[i, j] = array[i, j] + summa[i - 1, j];
+            else if (i == 0 && j > 0) summa[i, j] = array[i, j] + summa[i, j - 1];
+            else summa[0, 0] = array[0, 0];
+        }
+    }
+
+    path[0].path_x = M - 1;
+    path[0].path_y = N - 1;
+    int path_index = 1, x = M - 1, y = N - 1;
+    while ((x != 0 || y != 0) && path_index < M + N - 2)
+    {
+        path[path_index].path_x = x;
+        path[path_index].path_y = y;
+
+        if (x > 0 && y > 0)
+        {
+            if (summa[x, y - 1] >= summa[x - 1, y]) { path[path_index].path_y -= 1; y -= 1; }
+            else { path[path_index].path_x -= 1; x -= 1; }
+        }
+        else if (x > 0 && y == 0) { path[path_index].path_x -= 1; x -= 1; }
+        else if (x == 0 && y > 0) { path[path_index].path_y -= 1; y -= 1; }
+
+        path_index++;
+    }
+    path[path_index].path_x = 0;
+    path[path_index].path_y = 0;
+
+    Array.Reverse(path);
+
+    Console.WriteLine("Путь: ");
+    PrintPath_2DArray(array, path);
+    Console.WriteLine($"Сумма: {summa[M - 1, N - 1]}");
+
 }
 #endregion
 void Print1DArray(int[] array)
 {
     Console.ForegroundColor = ConsoleColor.Red;
-    for (int i = 0; i < array.Length; i++) Console.Write($"{array[i]} ");
+    for (int i = 0; i < array.Length; i++) Console.Write($"{array[i]}".PadRight(output_width));
     Console.ResetColor();
     Console.WriteLine();
 }
@@ -195,7 +237,7 @@ void Print2DArray(int[,] array)
     Console.ForegroundColor = ConsoleColor.Red;
     for (int i = 0; i < M; i++)
     {
-        for (int j = 0; j < N; j++) Console.Write($"{array[i, j]} ");
+        for (int j = 0; j < N; j++) Console.Write($"{array[i, j]}".PadRight(output_width));
         Console.WriteLine();
     }
     Console.ResetColor();
@@ -212,31 +254,37 @@ void PrintPath_1DArray(int[] array, int[] path)
             k++;
         }
         else Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write($"{array[i]} ");
+        Console.Write($"{array[i]}".PadRight(5));
     }
     Console.ResetColor();
     Console.WriteLine();
 }
 
-void PrintPath_2DArray(int[,] array, int[] path)
+void PrintPath_2DArray(int[,] array, Path[] path)
 {
-    for (int i = 0, j = 0, k = 0; i < M && j < N; j++)
+    int k = 0;
+    for (int i = 0; i < M && k < M + N - 1; i++)
     {
-        if (j == path[k])
+        for (int j = 0; j < N && k < M + N - 1; j++)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            k++;
+            if (i == path[k].path_x && j == path[k].path_y)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                k++;
+            }
+            else Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"{array[i, j]}".PadRight(output_width));
         }
-        else Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write($"{array[i, j]} ");
-        if (j == N) { j = 0; i++; }
-    }
+        Console.WriteLine();
+    }    
     Console.ResetColor();
     Console.WriteLine();
 }
+
 
 int[,] array_2d = new int[0, 0];
 int[] array_1d = [];
+
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 while (true) 
@@ -270,7 +318,7 @@ while (true)
 
         case "5":
             Console.WriteLine("Шахматная доска");
-            PrepareMethod(2, () => ChessBoard(array_1d));
+            PrepareMethod(2, () => ChessBoard(array_2d));
             break;
 
         case "0": return;
@@ -310,6 +358,12 @@ void PrepareMethod(int dimension, Action method)
         Print1DArray(array_1d);
         if (array_1d.Length >= 2) method();
     }
-    
+
     Console.ReadKey();
+}
+
+struct Path
+{
+    public int path_x;
+    public int path_y;
 }
