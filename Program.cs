@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 
 int N = 0, M = 1;
@@ -8,7 +10,7 @@ int[,] array_2d = new int[0, 0];
 int[] array_1d = [];
 bool positive = false;
 int range = 20;
-int weight = 0;
+int max_weight = 0;
 
 #region Select
 void SelectSort()
@@ -231,55 +233,41 @@ void ChessBoard()
 }
 #endregion
 
-#region Basackpack
-void Backpack(int max_weight)
-{    
-    //Union = weight, price
-    Union[] items = new Union[max_weight];
-    List<int> candidats = new List<int>();
-    int unit = 0;
-    int filled = 0;
-
-    for (int j = 0; j < N; j++)
+#region Backpack
+void Backpack()
+{
+    int[] backpack = new int[max_weight + 1];
+    List<int> order = [];
+    backpack[0] = 0;
+    
+    for (int i = 1; i <= max_weight; i++)
     {
-        items[j].first_member = array_2d[0, j];
-        items[j].second_member = array_2d[1, j];
+        int result = FindMaxCost(backpack, order, i);
+        _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
     }
-    Print2DArray();
 
-    filled = N;
-    //ничего не добавляется...
-    for (int k = array_2d[0, N - 1] + 1; k <= max_weight; k++)
+    foreach (int item in backpack) Console.WriteLine($"f = {item}");
+}
+
+int FindMaxCost(int[] backpack, List<int> order, int current_weight)
+{
+    int choice = -1;
+    int last_in_order = 0;
+    
+    for (int i = 0; i < N; i++)
     {
-        for (int j = 0; j < filled; j++)
+        if (current_weight - array_2d[0, i] >= 0)
         {
-            unit = items[j].first_member;
-            Console.WriteLine($"unit = {unit}, k - unit = {k - unit}");
-            if (items.Any(x => x.first_member == k - unit))
+            if (choice < backpack[current_weight - array_2d[0, i]] + array_2d[1, i])
             {
-                candidats.Add(items[k - unit].second_member + items[unit].second_member);
-            }
+                choice = backpack[current_weight - array_2d[0, i]] + array_2d[1, i];
+                last_in_order = i;
+            }                
         }
-
-        foreach (Union item in items)
-        {
-            Console.Write($"weight - {item.first_member}, price - {item.second_member}");
-            Console.WriteLine();
-        }
-
-        if (candidats.Count != 0)
-        {
-            items[k].second_member = candidats.Max();
-            filled++;
-            candidats.Clear();
-        }            
     }
+    order.Add(choice != -1 ? last_in_order : 0);
 
-    foreach (Union item in items) 
-    { 
-        Console.Write($"weight - {item.first_member}, price - {item.second_member}");
-        Console.WriteLine();
-    }
+    return choice;
 }
 #endregion
 void Print1DArray()
@@ -386,7 +374,8 @@ while (true)
         case "6":
             Console.WriteLine("Рюкзак");
             positive = true;
-            Backpack(PrepareData(6));
+            PrepareData(6);
+            Backpack();
             break;
 
         case "0": return;
@@ -396,9 +385,9 @@ while (true)
     Console.ReadKey();
 }
 
-int PrepareData(int choice)
+void PrepareData(int choice)
 {
-    N = 0; M = 1; weight = 0;
+    N = 0; M = 1; max_weight = 0;
     //Console.Write("Введите N (количество столбцов): ");
     //N = Convert.ToInt16(Console.ReadLine());
 
@@ -432,15 +421,15 @@ int PrepareData(int choice)
             {
                 M = 2; N = 3;
                 //Console.Write("Максимальный вес: ");
-                //weight = Convert.ToInt16(Console.ReadLine());
-                weight = 20;
+                //max_weight = Convert.ToInt16(Console.ReadLine());
+                max_weight = 13;
                 array_2d = new int[2, 3];
                 array_2d[0, 0] = 3;
                 array_2d[0, 1] = 5;
-                array_2d[0, 2] = 7;
+                array_2d[0, 2] = 8;
                 array_2d[1, 0] = 8;
                 array_2d[1, 1] = 14;
-                array_2d[1, 2] = 20;
+                array_2d[1, 2] = 23;
                 break;
             }
             else
@@ -457,8 +446,6 @@ int PrepareData(int choice)
             Print2DArray();
             break;
     }
-
-    return weight;
 }
 
 struct Union
