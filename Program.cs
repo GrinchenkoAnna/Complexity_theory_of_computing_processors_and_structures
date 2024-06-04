@@ -203,26 +203,26 @@ void ChessBoard()
         }
     }
 
-    path[0].first_member = M - 1;
-    path[0].second_member = N - 1;
+    path[0].first = M - 1;
+    path[0].second = N - 1;
     int path_index = 1, x = M - 1, y = N - 1;
     while ((x != 0 || y != 0) && path_index < M + N - 2)
     {
-        path[path_index].first_member = x;
-        path[path_index].second_member = y;
+        path[path_index].first = x;
+        path[path_index].second = y;
 
         if (x > 0 && y > 0)
         {
-            if (summa[x, y - 1] >= summa[x - 1, y]) { path[path_index].second_member -= 1; y -= 1; }
-            else { path[path_index].first_member -= 1; x -= 1; }
+            if (summa[x, y - 1] >= summa[x - 1, y]) { path[path_index].second -= 1; y -= 1; }
+            else { path[path_index].first -= 1; x -= 1; }
         }
-        else if (x > 0 && y == 0) { path[path_index].first_member -= 1; x -= 1; }
-        else if (x == 0 && y > 0) { path[path_index].second_member -= 1; y -= 1; }
+        else if (x > 0 && y == 0) { path[path_index].first -= 1; x -= 1; }
+        else if (x == 0 && y > 0) { path[path_index].second -= 1; y -= 1; }
 
         path_index++;
     }
-    path[path_index].first_member = 0;
-    path[path_index].second_member = 0;
+    path[path_index].first = 0;
+    path[path_index].second = 0;
 
     Array.Reverse(path);
 
@@ -237,38 +237,55 @@ void ChessBoard()
 void Backpack()
 {
     int[] backpack = new int[max_weight + 1];
-    List<int> order = [];
+    int[] order = new int[max_weight + 1];
     backpack[0] = 0;
     
     for (int i = 1; i <= max_weight; i++)
     {
-        int result = FindMaxCost(backpack, order, i);
+        int result = FindMaxCost(backpack, i).first;
         _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
     }
-
-    foreach (int item in backpack) Console.WriteLine($"f = {item}");
+    foreach (int item in backpack) Console.WriteLine($"f = {item}");  
+    
+    for (int i = max_weight; i >= 0;)
+    {
+        order[i] = FindMaxCost(backpack, i).second;
+        i = order[i];
+    }
+    //order.Reverse();
+    foreach (int set in order)
+    {
+        Console.WriteLine($"order: {set}");
+    }
 }
 
-int FindMaxCost(int[] backpack, List<int> order, int current_weight)
+Union FindMaxCost(int[] backpack, int current_weight)
 {
-    int choice = -1;
-    int last_in_order = 0;
-    
+    //Union = set weight, set step ago
+    Union Backpack = new()
+    {
+        first = -1,
+        second = -1
+    };
+
     for (int i = 0; i < N; i++)
     {
         if (current_weight - array_2d[0, i] >= 0)
         {
-            if (choice < backpack[current_weight - array_2d[0, i]] + array_2d[1, i])
+            if (Backpack.first < backpack[current_weight - array_2d[0, i]] + array_2d[1, i])
             {
-                choice = backpack[current_weight - array_2d[0, i]] + array_2d[1, i];
-                last_in_order = i;
+                Backpack.first = backpack[current_weight - array_2d[0, i]] + array_2d[1, i];
+                Backpack.second = current_weight - array_2d[0, i];
             }                
-        }
+        }        
     }
-    order.Add(choice != -1 ? last_in_order : 0);
 
-    return choice;
+    Console.WriteLine($"first = {Backpack.first}, second = {Backpack.second}");
+
+    return Backpack;
 }
+
+
 #endregion
 void Print1DArray()
 {
@@ -314,7 +331,7 @@ void PrintPath_2DArray(Union[] path)
     {
         for (int j = 0; j < N && k < M + N - 1; j++)
         {
-            if (i == path[k].first_member && j == path[k].second_member)
+            if (i == path[k].first && j == path[k].second)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 k++;
@@ -450,6 +467,6 @@ void PrepareData(int choice)
 
 struct Union
 {
-    public int first_member;
-    public int second_member;
+    public int first;
+    public int second;
 }
