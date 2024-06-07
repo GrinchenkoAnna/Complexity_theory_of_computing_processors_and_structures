@@ -4,13 +4,13 @@ using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 
-int N = 0, M = 1;
-const int output_width = 5;
-int[,] array_2d = new int[0, 0];
+int N = 0, M = 1;                   //размеры матриц
+const int output_width = 5;         //ширина вывода
+int[,] array_2d = new int[0, 0];    
 int[] array_1d = [];
-bool positive = false;
-int range = 20;
-int max_weight = 0;
+bool positive = false;              //генерировать только неотрицательные значения
+int range = 20;                     //диапазон генерации
+int max_weight = 0;                 //для рюкзака: максимальный вес
 
 #region Select
 void SelectSort()
@@ -236,53 +236,58 @@ void ChessBoard()
 #region Backpack
 void Backpack()
 {
+    //f - функция максимальной стоимости набора при данном весе
     int[] backpack = new int[max_weight + 1];
-    int[] order = new int[max_weight + 1];
+    List<int>[] items_sets = new List<int>[max_weight + 1];
+    
     backpack[0] = 0;
+    items_sets[0] = [];
     
     for (int i = 1; i <= max_weight; i++)
     {
-        int result = FindMaxCost(backpack, i).first;
+        int result = FindMaxCostAndFormItemsSet(backpack, i, ref items_sets);
         _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
     }
-    foreach (int item in backpack) Console.WriteLine($"f = {item}");  
-    
-    for (int i = max_weight; i >= 0;)
-    {
-        order[i] = FindMaxCost(backpack, i).second;
-        i = order[i];
-    }
-    //order.Reverse();
-    foreach (int set in order)
-    {
-        Console.WriteLine($"order: {set}");
-    }
+
+    Console.WriteLine($"Максимальная стоимость набора: {backpack[max_weight]}");
+    Console.WriteLine("Положены товары:");
+    foreach (int item in items_sets[max_weight]) Console.WriteLine($"{array_2d[0, item]}, {array_2d[1, item]}");
 }
 
-Union FindMaxCost(int[] backpack, int current_weight)
+int FindMaxCostAndFormItemsSet(int[] backpack, int current_weight, ref List<int>[] items_sets)
 {
-    //Union = set weight, set step ago
-    Union Backpack = new()
+    int items_cost = -1;
+    Union last_used_data = new()
     {
-        first = -1,
-        second = -1
+        first = -1, //последний добавленный в рюкзак элемент
+        second = -1 //индекс f, при котором был добавлен этот элемент
     };
+    int f_index = -1; //индекс, в котором будет вычисляться значение f    
 
     for (int i = 0; i < N; i++)
     {
-        if (current_weight - array_2d[0, i] >= 0)
+        f_index = current_weight - array_2d[0, i];
+        if (f_index >= 0)
         {
-            if (Backpack.first < backpack[current_weight - array_2d[0, i]] + array_2d[1, i])
+            if (items_cost < backpack[f_index] + array_2d[1, i])
             {
-                Backpack.first = backpack[current_weight - array_2d[0, i]] + array_2d[1, i];
-                Backpack.second = current_weight - array_2d[0, i];
+                items_cost = backpack[f_index] + array_2d[1, i];
+                last_used_data.first = i;
+                last_used_data.second = f_index;
             }                
         }        
     }
 
-    Console.WriteLine($"first = {Backpack.first}, second = {Backpack.second}");
+    if (last_used_data.first >= 0)
+    {
+        items_sets[current_weight] = new List<int>(items_sets[last_used_data.second])
+        {
+            last_used_data.first
+        };
+    }
+    else items_sets[current_weight] = [];
 
-    return Backpack;
+    return items_cost;
 }
 
 
@@ -405,8 +410,8 @@ while (true)
 void PrepareData(int choice)
 {
     N = 0; M = 1; max_weight = 0;
-    //Console.Write("Введите N (количество столбцов): ");
-    //N = Convert.ToInt16(Console.ReadLine());
+    Console.Write("Введите N (количество столбцов): ");
+    N = Convert.ToInt16(Console.ReadLine());
 
     Random random = new();
     int right_border, left_border;
@@ -436,18 +441,19 @@ void PrepareData(int choice)
         case 6:
             if (choice == 6)
             {
-                M = 2; N = 3;
-                //Console.Write("Максимальный вес: ");
-                //max_weight = Convert.ToInt16(Console.ReadLine());
-                max_weight = 13;
-                array_2d = new int[2, 3];
-                array_2d[0, 0] = 3;
-                array_2d[0, 1] = 5;
-                array_2d[0, 2] = 8;
-                array_2d[1, 0] = 8;
-                array_2d[1, 1] = 14;
-                array_2d[1, 2] = 23;
-                break;
+                M = 2;
+                Console.Write("Максимальный вес: ");
+                max_weight = Convert.ToInt16(Console.ReadLine());
+                //пример из методички: раскомментировать
+                //max_weight = 13;
+                //array_2d = new int[2, 3];
+                //array_2d[0, 0] = 3;
+                //array_2d[0, 1] = 5;
+                //array_2d[0, 2] = 8;
+                //array_2d[1, 0] = 8;
+                //array_2d[1, 1] = 14;
+                //array_2d[1, 2] = 23;
+                //break;
             }
             else
             {
@@ -465,6 +471,7 @@ void PrepareData(int choice)
     }
 }
 
+//структура для парных значений
 struct Union
 {
     public int first;
