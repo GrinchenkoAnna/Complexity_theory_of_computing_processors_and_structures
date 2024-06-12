@@ -9,7 +9,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
     class CustomArray
     {
         private short dimension;            //размерность массива - 1 или 2
-        private int size_col, size_row;     //размеры массива (столбцов, строк)
+        private int columns, rows;     //размеры массива (столбцов, строк)
 
         public int[] custom_array1;         //одномерный массив
         public int[,] custom_array2;        //двумерный массив
@@ -25,21 +25,21 @@ namespace Complexity_theory_of_computing_processors_and_structures
             set => custom_array2[i, j] = value;
         }
 
-        public int SizeCol
+        public int Columns
         {
-            get => size_col;
+            get => columns;
             set
             {
-                if (value >= 0) size_col = value;
+                if (value >= 0) columns = value;
                 else throw new ArgumentException("Недопустимый размер массива");
             }
         }
-        public int SizeRow
+        public int Rows
         {
-            get => size_row;
+            get => rows;
             set
             {
-                if (value >= 0) size_row = value;
+                if (value >= 0) rows = value;
                 else throw new ArgumentException("Недопустимый размер массива");
             }
         }
@@ -47,47 +47,47 @@ namespace Complexity_theory_of_computing_processors_and_structures
         public CustomArray(int size)
         {
             dimension = 1;
-            SizeCol = size;
-            custom_array1 = new int[SizeCol];
+            Columns = size;
+            custom_array1 = new int[Columns];
         }
         public CustomArray(int size, int min, int max) : this(size)
         {
             Random random = new();
-            for (int i = 0; i < SizeCol; i++)
+            for (int i = 0; i < Columns; i++)
                 custom_array1[i] = random.Next(min, max);
         }
 
         public CustomArray(int size1, int size2)
         {
             dimension = 2;
-            SizeCol = size1;
-            SizeRow = size2;
-            custom_array2 = new int[SizeRow, SizeCol];
+            Columns = size1;
+            Rows = size2;
+            custom_array2 = new int[Rows, Columns];
         }
 
         public CustomArray(int size1, int size2, int min, int max) : this(size1, size2)
         {
             Random random = new();
-            for (int i = 0; i < SizeRow; i++)
-                for (int j = 0; j < SizeCol; j++)
+            for (int i = 0; i < Rows; i++)
+                for (int j = 0; j < Columns; j++)
                     custom_array2[i, j] = random.Next(min, max);
         }
 
-        public void PrintCustomArray(int output_width)
+        public void PrintCustomArray(int output_width = 5)
         {
             Console.ForegroundColor = ConsoleColor.Red;
 
             switch (dimension)
             {
                 case 1:
-                    for (int i = 0; i < SizeCol; i++)
+                    for (int i = 0; i < Columns; i++)
                         Console.Write($"{custom_array1[i]}".PadRight(output_width));
                     break;
 
                 case 2:
-                    for (int i = 0; i < SizeRow; i++)
+                    for (int i = 0; i < Rows; i++)
                     {
-                        for (int j = 0; j < SizeCol; j++)
+                        for (int j = 0; j < Columns; j++)
                             Console.Write($"{custom_array2[i, j]}".PadRight(output_width));
                         Console.WriteLine();
                     }
@@ -98,8 +98,16 @@ namespace Complexity_theory_of_computing_processors_and_structures
             Console.WriteLine();
         }
 
-        public int GetElement(int i) { return custom_array1[i]; }
-        public int GetElement(int i, int j) { return custom_array2[i, j]; }
+        public static CustomArray ResizeCustomArray(CustomArray old_custom_array, int new_size)
+        {
+            CustomArray new_custom_array = new(new_size);
+
+            int border = old_custom_array.Columns <= new_custom_array.Columns ? old_custom_array.Columns : new_custom_array.Columns;
+            for (int i = 0; i < border; i++)
+                new_custom_array[i] = old_custom_array[i];
+
+            return new_custom_array;
+        }
 
         public static bool operator <(CustomArray lhs, CustomArray rhs)
         { return lhs < rhs; }

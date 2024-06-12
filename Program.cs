@@ -7,23 +7,21 @@ using System.Runtime.InteropServices;
 
 internal class Program
 {
-    static int N = 0, M = 1;                   //размеры матриц
-    const int output_width = 5;         //ширина вывода
-    static int[,] array_2d = new int[0, 0];
+    static int N_to_delete = 0, M_to_delete = 1;    //размеры матриц (старое, временно здесь чтобы не было ошибок)
+    static int[,] array_2d = new int[0, 0];         //массивы        (старое, временно здесь чтобы не было ошибок)
     static int[] array_1d = [];
-    static bool positive = false;              //генерировать только неотрицательные значения
-    static int range = 20;                     //диапазон генерации
-    static int max_weight = 0;                 //для рюкзака: максимальный вес
+    static int range = 20;                          //диапазон генерации
+    static int max_weight = 0;                      //для рюкзака: максимальный вес
 
     #region Select
     static void SelectSort(CustomArray array)
     {
         int comparision = 0, permutation = 0;
 
-        for (int i = 0; i < array.SizeCol; i++)
+        for (int i = 0; i < array.Columns; i++)
         {
             int min = i;
-            for (int j = i + 1; j < array.SizeCol; j++)
+            for (int j = i + 1; j < array.Columns; j++)
             {
                 if (array[j] < array[min])
                     min = j;
@@ -35,25 +33,25 @@ internal class Program
         }
 
         Console.WriteLine("\u2193");
-        array.PrintCustomArray(output_width);
+        array.PrintCustomArray();
 
-        Console.WriteLine($"Теоретическая трудоемкость алгоритма: 1/2*N^2 = {Math.Ceiling((double)Math.Pow(array.SizeCol, 2) / 2)}");
+        Console.WriteLine($"Теоретическая трудоемкость алгоритма: 1/2*N^2 = {Math.Ceiling((double)Math.Pow(array.Columns, 2) / 2)}");
         Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
     }
     #endregion
 
     #region Bubble
-    static void BubbleSort()
+    static void BubbleSort(CustomArray array)
     {
         int comparision = 0, permutation = 0;
 
-        for (int i = 0; i < array_1d.Length; i++)
+        for (int i = 0; i < array.Columns; i++)
         {
-            for (int j = 0; j < array_1d.Length - 1 - i; j++)
+            for (int j = 0; j < array.Columns - 1 - i; j++)
             {
-                if (array_1d[j] > array_1d[j + 1])
+                if (array[j] > array[j + 1])
                 {
-                    (array_1d[j], array_1d[j + 1]) = (array_1d[j + 1], array_1d[j]);
+                    (array[j], array[j + 1]) = (array[j + 1], array[j]);
                     permutation++;
                 }
                 comparision++;
@@ -61,34 +59,33 @@ internal class Program
         }
 
         Console.WriteLine("\u2193");
-        //Print1DArray();
+        array.PrintCustomArray();
 
-        Console.WriteLine($"Теоретическая трудоемкость алгоритма: N^2 = {Math.Pow(array_1d.Length, 2)}");
+        Console.WriteLine($"Теоретическая трудоемкость алгоритма: N^2 = {Math.Pow(array.Columns, 2)}");
         Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
     }
     #endregion
 
     #region Merge
-    static void MergeSort()
+    static void MergeSort(CustomArray array)
     {
         int comparision = 0, permutation = 0;
-        int delete = CheckN();
-        Console.WriteLine($"delete = {delete}");
-        Sort(0, array_1d.Length - 1, ref comparision, ref permutation);
+        int delete = CheckN(ref array);
+        Sort(array, 0, array.Columns - 1, ref comparision, ref permutation);
 
         Console.WriteLine("\u2193");
-        //Print1DArray();
+        array.PrintCustomArray();
         if (delete != 0)
         {
             Console.WriteLine("Удаление лишних элементов:");
-            Array.Resize(ref array_1d, array_1d.Length - delete);
-            //Print1DArray();
+            array = CustomArray.ResizeCustomArray(array, array.Columns - delete);
+            array.PrintCustomArray();
         }
 
-        Console.WriteLine($"Теоретическая трудоемкость алгоритма: N*logN = {array_1d.Length * Math.Ceiling(Math.Log2(array_1d.Length))}");
+        Console.WriteLine($"Теоретическая трудоемкость алгоритма: N*logN = {array.Columns * Math.Ceiling(Math.Log2(array.Columns))}");
         Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
     }
-    static void Sort(int left, int right, ref int comparision, ref int permutation)
+    static void Sort(CustomArray array, int left, int right, ref int comparision, ref int permutation)
     {
 
         if (left < right)
@@ -96,14 +93,14 @@ internal class Program
             comparision++;
 
             int middle = left + (right - left) / 2;
-            Sort(left, middle, ref comparision, ref permutation);
-            Sort(middle + 1, right, ref comparision, ref permutation);
-            Merge(left, middle, right, comparision, permutation);
+            Sort(array, left, middle, ref comparision, ref permutation);
+            Sort(array, middle + 1, right, ref comparision, ref permutation);
+            Merge(array, left, middle, right, comparision, permutation);
 
             permutation++;
         }
     }
-    static void Merge(int left, int middle, int right, int comparision, int permutation)
+    static void Merge(CustomArray array, int left, int middle, int right, int comparision, int permutation)
     {
         int size1 = middle - left + 1;
         int size2 = right - middle;
@@ -112,9 +109,9 @@ internal class Program
         List<int> tempRight = [];
 
         for (i = 0; i < size1; i++)
-            tempLeft.Add(array_1d[left + i]);
+            tempLeft.Add(array[left + i]);
         for (j = 0; j < size2; j++)
-            tempRight.Add(array_1d[middle + 1 + j]);
+            tempRight.Add(array[middle + 1 + j]);
 
         i = 0; j = 0;
         int k = left;
@@ -123,13 +120,13 @@ internal class Program
         {
             if (tempLeft[i] <= tempRight[j])
             {
-                array_1d[k] = tempLeft[i];
+                array[k] = tempLeft[i];
                 i++;
                 permutation++;
             }
             else
             {
-                array_1d[k] = tempRight[j];
+                array[k] = tempRight[j];
                 j++;
                 permutation++;
             }
@@ -140,7 +137,7 @@ internal class Program
 
         while (i < size1)
         {
-            array_1d[k] = tempLeft[i];
+            array[k] = tempLeft[i];
             i++;
             k++;
             permutation++;
@@ -148,44 +145,45 @@ internal class Program
 
         while (j < size2)
         {
-            array_1d[k] = tempRight[j];
+            array[k] = tempRight[j];
             j++;
             k++;
             permutation++;
         }
     }
-    static int CheckN()
+    static int CheckN(ref CustomArray array)
     {
         for (int i = 1; ; i++)
         {
-            if (array_1d.Length == Math.Pow(2, i))
+            if (array.Columns == Math.Pow(2, i))
             {
                 Console.WriteLine($"Число элементов в массиве = {array_1d.Length} = 2^k, добавлять элементы не требуется");
                 return 0;
             }
-            else if (array_1d.Length < Math.Pow(2, i))
+            else if (array.Columns < Math.Pow(2, i))
             {
-                int to_add = (int)Math.Pow(2, i) - array_1d.Length;
-                int prev_length = array_1d.Length;
-                Console.WriteLine($"Число элементов в массиве = {array_1d.Length} != 2^k, необходимо добавить {to_add}");
-                int M = FindMax();
-                Array.Resize(ref array_1d, array_1d.Length + to_add);
+                int to_add = (int)Math.Pow(2, i) - array.Columns;
+                int prev_length = array.Columns;
+                int Max = FindMax(array);
+
+                Console.WriteLine($"Число элементов в массиве = {prev_length} != 2^k, необходимо добавить {to_add}");          
+                array = CustomArray.ResizeCustomArray(array, prev_length + to_add);
                 for (int j = 1; j <= to_add; j++)
-                    array_1d[prev_length - 1 + j] = M + j;
+                    array[prev_length - 1 + j] = Max + j;
                 Console.WriteLine("Результат:");
-                //Print1DArray();
+                array.PrintCustomArray();
 
                 return to_add;
             }
         }
     }
-    static int FindMax()
+    static int FindMax(CustomArray array)
     {
-        int max = array_1d[0];
-        for (int i = 0; i < array_1d.Length; i++)
+        int max = array[0];
+        for (int i = 0; i < array.Columns; i++)
         {
-            if (array_1d[i] > max)
-                max = array_1d[i];
+            if (array[i] > max)
+                max = array[i];
         }
         return max;
     }
@@ -194,17 +192,17 @@ internal class Program
     #region Stairs
     static void Stairs()
     {
-        int[] summa = new int[N];
-        int[] path = new int[N];
+        int[] summa = new int[N_to_delete];
+        int[] path = new int[N_to_delete];
 
         summa[0] = array_1d[0];
         summa[1] = Math.Max(array_1d[1] + summa[0], array_1d[1]);
-        for (int i = 2; i < N; i++)
+        for (int i = 2; i < N_to_delete; i++)
             summa[i] = array_1d[i] + Math.Max(summa[i - 1], summa[i - 2]);
 
-        path[0] = N - 1;
+        path[0] = N_to_delete - 1;
         int path_index = 1;
-        for (int i = N - 1; i - 2 >= 0;)
+        for (int i = N_to_delete - 1; i - 2 >= 0;)
         {
             int step = Math.Max(summa[i - 1], summa[i - 2]);
             i = Array.LastIndexOf(summa, step, i - 1);
@@ -218,19 +216,19 @@ internal class Program
 
         Console.WriteLine("Путь: ");
         //PrintPath_1DArray(path);
-        Console.WriteLine($"Сумма: {summa[N - 1]}");
+        Console.WriteLine($"Сумма: {summa[N_to_delete - 1]}");
     }
     #endregion
 
     #region ChessBoard
     static void ChessBoard()
     {
-        int[,] summa = new int[M, N];
-        Union[] path = new Union[M + N - 1];
+        int[,] summa = new int[M_to_delete, N_to_delete];
+        Union[] path = new Union[M_to_delete + N_to_delete - 1];
 
-        for (int i = 0; i < M; i++)
+        for (int i = 0; i < M_to_delete; i++)
         {
-            for (int j = 0; j < N; j++)
+            for (int j = 0; j < N_to_delete; j++)
             {
                 if (i > 0 && j > 0)
                     summa[i, j] = array_2d[i, j] + Math.Max(summa[i, j - 1], summa[i - 1, j]);
@@ -243,10 +241,10 @@ internal class Program
             }
         }
 
-        path[0].first = M - 1;
-        path[0].second = N - 1;
-        int path_index = 1, x = M - 1, y = N - 1;
-        while ((x != 0 || y != 0) && path_index < M + N - 2)
+        path[0].first = M_to_delete - 1;
+        path[0].second = N_to_delete - 1;
+        int path_index = 1, x = M_to_delete - 1, y = N_to_delete - 1;
+        while ((x != 0 || y != 0) && path_index < M_to_delete + N_to_delete - 2)
         {
             path[path_index].first = x;
             path[path_index].second = y;
@@ -284,7 +282,7 @@ internal class Program
 
         Console.WriteLine("Путь: ");
         //PrintPath_2DArray(path);
-        Console.WriteLine($"Сумма: {summa[M - 1, N - 1]}");
+        Console.WriteLine($"Сумма: {summa[M_to_delete - 1, N_to_delete - 1]}");
 
     }
     #endregion
@@ -320,7 +318,7 @@ internal class Program
         };
         int f_index;
 
-        for (int i = 0; i < N; i++)
+        for (int i = 0; i < N_to_delete; i++)
         {
             f_index = current_weight - array_2d[0, i];
             if (f_index >= 0)
@@ -376,9 +374,9 @@ internal class Program
     {
         //Union = x, y
         int k = 0;
-        for (int i = 0; i < M && k < M + N - 1; i++)
+        for (int i = 0; i < M_to_delete && k < M_to_delete + N_to_delete - 1; i++)
         {
-            for (int j = 0; j < N && k < M + N - 1; j++)
+            for (int j = 0; j < N_to_delete && k < M_to_delete + N_to_delete - 1; j++)
             {
                 if (i == path[k].first && j == path[k].second)
                 {
@@ -387,7 +385,7 @@ internal class Program
                 }
                 else
                     Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"{array_2d[i, j]}".PadRight(output_width));
+                Console.Write($"{array_2d[i, j]}".PadRight(5));
             }
             Console.WriteLine();
         }
@@ -395,6 +393,28 @@ internal class Program
         Console.WriteLine();
     }
     #endregion
+
+    static CustomArray PrepareArray(bool positive, int M = 1)
+    {
+        CustomArray array;
+        int N, max, min;
+
+        Console.Write("Введите N (количество столбцов): ");
+        N = Convert.ToInt16(Console.ReadLine());
+
+        _ = positive ? min = -10 : min = 1;
+        max = min + range;
+
+        if (M > 1) 
+            array = new(M, N, min, max);
+        else
+            array = new(N, min, max);
+
+        array.PrintCustomArray();
+
+        return array;
+    }
+
     private static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -406,46 +426,23 @@ internal class Program
             string choice = Console.ReadLine();
             Console.WriteLine();
 
-            N = 0; M = 1; max_weight = 0;
-            Console.Write("Введите N (количество столбцов): ");
-            N = Convert.ToInt16(Console.ReadLine());
-
-            Random random = new();
-            int right_border, left_border;
-            switch (positive)
-            {
-                case false:
-                    right_border = -10;
-                    break;
-
-                case true:
-                    right_border = 1;
-                    break;
-            }
-            left_border = right_border + range;
-
-            if (positive == true)
-                positive = false;
+            max_weight = 0;
 
             switch (choice)
             {
                 case "1":
-                    Console.WriteLine("SelectSort");
-                    CustomArray array = new(N, right_border, left_border);
-                    array.PrintCustomArray(output_width);
-                    SelectSort(array);
+                    Console.WriteLine("SelectSort");                    
+                    SelectSort(PrepareArray(false));
                     break;
 
                 case "2":
                     Console.WriteLine("BubbleSort");
-                    PrepareData(2);
-                    BubbleSort();
+                    BubbleSort(PrepareArray(false));
                     break;
 
                 case "3":
                     Console.WriteLine("MergeSort");
-                    PrepareData(3);
-                    MergeSort();
+                    MergeSort(PrepareArray(false));
                     break;
 
                 case "4":
@@ -482,67 +479,67 @@ internal class Program
 
         void PrepareData(int choice)
         {
-            N = 0; M = 1; max_weight = 0;
-            Console.Write("Введите N (количество столбцов): ");
-            N = Convert.ToInt16(Console.ReadLine());
+            //N = 0; M = 1; max_weight = 0;
+            //Console.Write("Введите N (количество столбцов): ");
+            //N = Convert.ToInt16(Console.ReadLine());
 
-            Random random = new();
-            int right_border, left_border;
-            switch (positive)
-            {
-                case false:
-                    right_border = -10;
-                    break;
+            //Random random = new();
+            //int right_border, left_border;
+            //switch (positive)
+            //{
+            //    case false:
+            //        right_border = -10;
+            //        break;
 
-                case true:
-                    right_border = 1;
-                    break;
-            }
-            left_border = right_border + range;
+            //    case true:
+            //        right_border = 1;
+            //        break;
+            //}
+            //left_border = right_border + range;
 
-            switch (choice)
-            {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    CustomArray array = new(N, right_border, left_border);
-                    array.PrintCustomArray(output_width);
-                    break;
+            //switch (choice)
+            //{
+            //    case 1:
+            //    case 2:
+            //    case 3:
+            //    case 4:
+            //        CustomArray array = new(N, right_border, left_border);
+            //        array.PrintCustomArray(output_width);
+            //        break;
 
-                case 5:
-                case 6:
-                    if (choice == 6)
-                    {
-                        M = 2;
-                        Console.Write("Максимальный вес: ");
-                        max_weight = Convert.ToInt16(Console.ReadLine());
-                        //пример из методички
-                        //max_weight = 13;
-                        //array_2d = new int[2, 3];
-                        //array_2d[0, 0] = 3;
-                        //array_2d[0, 1] = 5;
-                        //array_2d[0, 2] = 8;
-                        //array_2d[1, 0] = 8;
-                        //array_2d[1, 1] = 14;
-                        //array_2d[1, 2] = 23;
-                        //break;
-                    }
-                    else
-                    {
-                        Console.Write("Введите M (количество строк): ");
-                        M = Convert.ToInt16(Console.ReadLine());
-                    }
-                    Array.Clear(array_2d);
-                    array_2d = new int[M, N];
-                    for (int i = 0; i < M; i++)
-                    {
-                        for (int j = 0; j < N; j++)
-                            array_2d[i, j] = random.Next(right_border, left_border);
-                    }
-                    //Print2DArray();
-                    break;
-            }
+            //    case 5:
+            //    case 6:
+            //        if (choice == 6)
+            //        {
+            //            M = 2;
+            //            Console.Write("Максимальный вес: ");
+            //            max_weight = Convert.ToInt16(Console.ReadLine());
+            //            //пример из методички
+            //            //max_weight = 13;
+            //            //array_2d = new int[2, 3];
+            //            //array_2d[0, 0] = 3;
+            //            //array_2d[0, 1] = 5;
+            //            //array_2d[0, 2] = 8;
+            //            //array_2d[1, 0] = 8;
+            //            //array_2d[1, 1] = 14;
+            //            //array_2d[1, 2] = 23;
+            //            //break;
+            //        }
+            //        else
+            //        {
+            //            Console.Write("Введите M (количество строк): ");
+            //            M = Convert.ToInt16(Console.ReadLine());
+            //        }
+            //        Array.Clear(array_2d);
+            //        array_2d = new int[M, N];
+            //        for (int i = 0; i < M; i++)
+            //        {
+            //            for (int j = 0; j < N; j++)
+            //                array_2d[i, j] = random.Next(right_border, left_border);
+            //        }
+            //        //Print2DArray();
+            //        break;
+            //}
         }
     }
 }
