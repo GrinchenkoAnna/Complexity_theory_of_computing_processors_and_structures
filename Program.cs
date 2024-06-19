@@ -190,61 +190,67 @@ internal class Program
     #endregion
 
     #region Stairs
-    static void Stairs()
+    static void Stairs(CustomArray array)
     {
-        int[] summa = new int[N_to_delete];
-        int[] path = new int[N_to_delete];
+        int N = array.Columns;
+        int[] summa = new int[N];
+        int[] path = new int[N];
 
-        summa[0] = array_1d[0];
-        summa[1] = Math.Max(array_1d[1] + summa[0], array_1d[1]);
-        for (int i = 2; i < N_to_delete; i++)
-            summa[i] = array_1d[i] + Math.Max(summa[i - 1], summa[i - 2]);
+        summa[0] = array[0];
+        summa[1] = Math.Max(array[1] + summa[0], array[1]);
+        for (int i = 2; i < N; i++)
+            summa[i] = array[i] + Math.Max(summa[i - 1], summa[i - 2]);
 
-        path[0] = N_to_delete - 1;
+        path[0] = N - 1;
         int path_index = 1;
-        for (int i = N_to_delete - 1; i - 2 >= 0;)
+        for (int i = N - 1; i - 2 >= 0;)
         {
             int step = Math.Max(summa[i - 1], summa[i - 2]);
             i = Array.LastIndexOf(summa, step, i - 1);
             path[path_index] = i;
             path_index++;
             if (i == 1 && summa[0] > 0)
+            {
                 path[path_index] = 0;
+                path_index++;
+            }
+                
         }
         Array.Resize(ref path, path_index);
         Array.Reverse(path);
 
         Console.WriteLine("Путь: ");
-        //PrintPath_1DArray(path);
-        Console.WriteLine($"Сумма: {summa[N_to_delete - 1]}");
+        array.PrintPath(path);
+        Console.WriteLine($"Сумма: {summa[N - 1]}");
     }
     #endregion
 
     #region ChessBoard
-    static void ChessBoard()
+    static void ChessBoard(CustomArray array)
     {
-        int[,] summa = new int[M_to_delete, N_to_delete];
-        Union[] path = new Union[M_to_delete + N_to_delete - 1];
+        int M = array.Rows, N = array.Columns;
+        int[,] summa = new int[M, N];
+        Union[] path = new Union[M + N - 1];
 
-        for (int i = 0; i < M_to_delete; i++)
+        for (int i = 0; i < M; i++)
         {
-            for (int j = 0; j < N_to_delete; j++)
+            for (int j = 0; j < N; j++)
             {
                 if (i > 0 && j > 0)
-                    summa[i, j] = array_2d[i, j] + Math.Max(summa[i, j - 1], summa[i - 1, j]);
+                    summa[i, j] = array[i, j] + Math.Max(summa[i, j - 1], summa[i - 1, j]);
                 else if (i > 0 && j == 0)
-                    summa[i, j] = array_2d[i, j] + summa[i - 1, j];
+                    summa[i, j] = array[i, j] + summa[i - 1, j];
                 else if (i == 0 && j > 0)
-                    summa[i, j] = array_2d[i, j] + summa[i, j - 1];
+                    summa[i, j] = array[i, j] + summa[i, j - 1];
                 else
-                    summa[0, 0] = array_2d[0, 0];
+                    summa[0, 0] = array[0, 0];
             }
         }
 
-        path[0].first = M_to_delete - 1;
-        path[0].second = N_to_delete - 1;
-        int path_index = 1, x = M_to_delete - 1, y = N_to_delete - 1;
-        while ((x != 0 || y != 0) && path_index < M_to_delete + N_to_delete - 2)
+        path[0].first = M - 1;
+        path[0].second = N - 1;
+        int path_index = 1, x = M - 1, y = N - 1;
+        while ((x != 0 || y != 0) && path_index < M + N - 2)
         {
             path[path_index].first = x;
             path[path_index].second = y;
@@ -281,14 +287,14 @@ internal class Program
         Array.Reverse(path);
 
         Console.WriteLine("Путь: ");
-        //PrintPath_2DArray(path);
-        Console.WriteLine($"Сумма: {summa[M_to_delete - 1, N_to_delete - 1]}");
+        array.PrintPath(path);
+        Console.WriteLine($"Сумма: {summa[M - 1, N - 1]}");
 
     }
     #endregion
 
     #region Backpack
-    static void Backpack()
+    static void Backpack(CustomArray array)
     {
         //f - функция максимальной стоимости набора при данном весе
         int[] backpack = new int[max_weight + 1];
@@ -352,61 +358,23 @@ internal class Program
     }
     #endregion
 
-    #region PrintPath
-    void PrintPath_1DArray(int[] path)
-    {
-        for (int i = 0, k = 0; i < array_1d.Length; i++)
-        {
-            if (i == path[k])
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                k++;
-            }
-            else
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write($"{array_1d[i]}".PadRight(5));
-        }
-        Console.ResetColor();
-        Console.WriteLine();
-    }
-
-    void PrintPath_2DArray(Union[] path)
-    {
-        //Union = x, y
-        int k = 0;
-        for (int i = 0; i < M_to_delete && k < M_to_delete + N_to_delete - 1; i++)
-        {
-            for (int j = 0; j < N_to_delete && k < M_to_delete + N_to_delete - 1; j++)
-            {
-                if (i == path[k].first && j == path[k].second)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    k++;
-                }
-                else
-                    Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"{array_2d[i, j]}".PadRight(5));
-            }
-            Console.WriteLine();
-        }
-        Console.ResetColor();
-        Console.WriteLine();
-    }
-    #endregion
-
-    static CustomArray PrepareArray(bool positive, int M = 1)
+    static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
     {
         CustomArray array;
-        int N, max, min;
+        int M, N, max, min;
 
         Console.Write("Введите N (количество столбцов): ");
         N = Convert.ToInt16(Console.ReadLine());
 
-        _ = positive ? min = -10 : min = 1;
+        _ = is_positive ? min = 1 : min = -10;
         max = min + range;
 
-        if (M > 1) 
+        if (is_two_dimensional)
+        {
+            Console.Write("Введите M (количество строк): ");
+            M = Convert.ToInt16(Console.ReadLine());
             array = new(M, N, min, max);
+        }            
         else
             array = new(N, min, max);
 
@@ -415,7 +383,7 @@ internal class Program
         return array;
     }
 
-    private static void Main(string[] args)
+    private static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -432,42 +400,36 @@ internal class Program
             {
                 case "1":
                     Console.WriteLine("SelectSort");                    
-                    SelectSort(PrepareArray(false));
+                    SelectSort(PrepareArray());
                     break;
 
                 case "2":
                     Console.WriteLine("BubbleSort");
-                    BubbleSort(PrepareArray(false));
+                    BubbleSort(PrepareArray());
                     break;
 
                 case "3":
                     Console.WriteLine("MergeSort");
-                    MergeSort(PrepareArray(false));
+                    MergeSort(PrepareArray());
                     break;
 
                 case "4":
                     Console.WriteLine("Лестница");
-                    PrepareData(4);
-                    Stairs();
+                    Stairs(PrepareArray());
                     break;
 
                 case "5":
                     Console.WriteLine("Шахматная доска");
-                    PrepareData(5);
-                    ChessBoard();
+                    ChessBoard(PrepareArray(false, true));
                     break;
 
                 case "6":
                     Console.WriteLine("Рюкзак");
-                    positive = true;
-                    PrepareData(6);
-                    Backpack();
+                    Backpack(PrepareArray(true, false));
                     break;
 
                 case "7":
-                    Console.WriteLine("Флойд");
-                    PrepareData(7);
-                    Backpack();
+                    Console.WriteLine("Флойд");                    
                     break;
 
                 case "0": return;

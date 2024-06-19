@@ -8,11 +8,11 @@ namespace Complexity_theory_of_computing_processors_and_structures
 {
     class CustomArray
     {
-        private short dimension;            //размерность массива - 1 или 2
+        private short dimension;       //размерность массива - 1 или 2
         private int columns, rows;     //размеры массива (столбцов, строк)
 
-        public int[] custom_array1;         //одномерный массив
-        public int[,] custom_array2;        //двумерный массив
+        public int[] custom_array1;    //одномерный массив
+        public int[,] custom_array2;   //двумерный массив
 
         public int this[int i]
         {
@@ -88,12 +88,52 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     for (int i = 0; i < Rows; i++)
                     {
                         for (int j = 0; j < Columns; j++)
-                            Console.Write($"{custom_array2[i, j]}".PadRight(output_width));
+                            Console.Write($"{custom_array2[i, j]}".PadLeft(output_width));
                         Console.WriteLine();
                     }
                     break;
             }
 
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+        
+        public void PrintPath(int[] path, int output_width = 5)
+        {
+            for (int i = 0, k = 0; i < Columns; i++)
+            {
+                if (i == path[k])
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    k++;
+                }
+                else
+                    Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write($"{custom_array1[i]}".PadRight(output_width));
+            }
+            Console.ResetColor();
+            Console.WriteLine();
+        } 
+        
+        public void PrintPath(Union[] path, int output_width = 5)
+        {
+            //Union = x, y
+            int k = 0;
+            for (int i = 0; i < Rows && k < Rows + Columns - 1; i++)
+            {
+                for (int j = 0; j < Columns && k < Rows + Columns - 1; j++)
+                {
+                    if (i == path[k].first && j == path[k].second)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        k++;
+                    }
+                    else
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"{custom_array2[i, j]}".PadLeft(output_width));
+                }
+                Console.WriteLine();
+            }
             Console.ResetColor();
             Console.WriteLine();
         }
@@ -109,13 +149,35 @@ namespace Complexity_theory_of_computing_processors_and_structures
             return new_custom_array;
         }
 
+        //не используется
+        public static CustomArray ReverseCustomArray(CustomArray old_custom_array)
+        {
+            int size = old_custom_array.Columns;
+            CustomArray new_custom_array = new(size);
+
+            for (int i = 0; i < size; i++)
+                new_custom_array[i] = old_custom_array[size - 1 - i];
+
+            return new_custom_array;
+        }
+
         public static bool operator <(CustomArray lhs, CustomArray rhs)
         { return lhs < rhs; }
         public static bool operator >(CustomArray lhs, CustomArray rhs)
         { return lhs > rhs; }
         public static bool operator ==(CustomArray lhs, CustomArray rhs)
         { return lhs == rhs; }
+        public static bool operator ==(int lhs, CustomArray rhs) //не используется
+        { 
+            //оптимизировать - хэш-таблица или бинарный поиск
+            for (int i = 0; i < rhs.Columns; i++)
+                if (lhs == rhs[i]) 
+                    return true;
+            return false; 
+        }
         public static bool operator !=(CustomArray lhs, CustomArray rhs)
         { return lhs != rhs; }
+        public static bool operator !=(int lhs, CustomArray rhs) //не используется
+        { return !(lhs == rhs); }
     }
 }
