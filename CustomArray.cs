@@ -44,6 +44,8 @@ namespace Complexity_theory_of_computing_processors_and_structures
             }
         }
 
+        public CustomArray() { }
+
         public CustomArray(int size)
         {
             dimension = 1;
@@ -57,12 +59,22 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 custom_array1[i] = random.Next(min, max);
         }
 
-        public CustomArray(int size1, int size2)
+        public CustomArray(int size1, int size2, bool test = false)
         {
             dimension = 2;
-            Columns = size1;
-            Rows = size2;
+            Rows = size1;
+            Columns = size2;
             custom_array2 = new int[Rows, Columns];
+
+            if (test)
+            {
+                custom_array2[0, 0] = 5;
+                custom_array2[0, 1] = 7;
+                custom_array2[0, 2] = 11;
+                custom_array2[1, 0] = 9;
+                custom_array2[1, 1] = 13;
+                custom_array2[1, 2] = 21;
+            }
         }
 
         public CustomArray(int size1, int size2, int min, int max) : this(size1, size2)
@@ -73,7 +85,13 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     custom_array2[i, j] = random.Next(min, max);
         }
 
-        public void PrintCustomArray(int output_width = 5)
+        public void PrintSingleElement(int i)
+        { Console.Write(custom_array1[i]); }
+
+        public void PrintSingleElement(int i, int j)
+        { Console.Write(custom_array2[i, j]); }
+
+        public void PrintArray(int output_width = 5)
         {
             Console.ForegroundColor = ConsoleColor.Red;
 
@@ -88,7 +106,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     for (int i = 0; i < Rows; i++)
                     {
                         for (int j = 0; j < Columns; j++)
-                            Console.Write($"{custom_array2[i, j]}".PadLeft(output_width));
+                        { Console.Write($"{custom_array2[i, j]}".PadLeft(output_width)); }
                         Console.WriteLine();
                     }
                     break;
@@ -96,8 +114,8 @@ namespace Complexity_theory_of_computing_processors_and_structures
 
             Console.ResetColor();
             Console.WriteLine();
-        }
-        
+        }        
+
         public void PrintPath(int[] path, int output_width = 5)
         {
             for (int i = 0, k = 0; i < Columns; i++)
@@ -115,7 +133,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             Console.WriteLine();
         } 
         
-        public void PrintPath(Union[] path, int output_width = 5)
+        public void PrintPath(Program.Union[] path, int output_width = 5)
         {
             //Union = x, y
             int k = 0;
@@ -138,7 +156,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             Console.WriteLine();
         }
 
-        public static CustomArray ResizeCustomArray(CustomArray old_custom_array, int new_size)
+        public static CustomArray ResizeArray(CustomArray old_custom_array, int new_size)
         {
             CustomArray new_custom_array = new(new_size);
 
@@ -150,7 +168,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         }
 
         //не используется
-        public static CustomArray ReverseCustomArray(CustomArray old_custom_array)
+        public static CustomArray ReverseArray(CustomArray old_custom_array)
         {
             int size = old_custom_array.Columns;
             CustomArray new_custom_array = new(size);

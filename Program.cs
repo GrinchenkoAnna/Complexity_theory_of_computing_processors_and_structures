@@ -7,11 +7,12 @@ using System.Runtime.InteropServices;
 
 internal class Program
 {
-    static int N_to_delete = 0, M_to_delete = 1;    //размеры матриц (старое, временно здесь чтобы не было ошибок)
-    static int[,] array_2d = new int[0, 0];         //массивы        (старое, временно здесь чтобы не было ошибок)
-    static int[] array_1d = [];
     static int range = 20;                          //диапазон генерации
-    static int max_weight = 0;                      //для рюкзака: максимальный вес
+    public struct Union                             //структура для парных значений
+    {
+        public int first;
+        public int second;
+    }
 
     #region Select
     static void SelectSort(CustomArray array)
@@ -33,7 +34,7 @@ internal class Program
         }
 
         Console.WriteLine("\u2193");
-        array.PrintCustomArray();
+        array.PrintArray();
 
         Console.WriteLine($"Теоретическая трудоемкость алгоритма: 1/2*N^2 = {Math.Ceiling((double)Math.Pow(array.Columns, 2) / 2)}");
         Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
@@ -59,7 +60,7 @@ internal class Program
         }
 
         Console.WriteLine("\u2193");
-        array.PrintCustomArray();
+        array.PrintArray();
 
         Console.WriteLine($"Теоретическая трудоемкость алгоритма: N^2 = {Math.Pow(array.Columns, 2)}");
         Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
@@ -74,12 +75,12 @@ internal class Program
         Sort(array, 0, array.Columns - 1, ref comparision, ref permutation);
 
         Console.WriteLine("\u2193");
-        array.PrintCustomArray();
+        array.PrintArray();
         if (delete != 0)
         {
             Console.WriteLine("Удаление лишних элементов:");
-            array = CustomArray.ResizeCustomArray(array, array.Columns - delete);
-            array.PrintCustomArray();
+            array = CustomArray.ResizeArray(array, array.Columns - delete);
+            array.PrintArray();
         }
 
         Console.WriteLine($"Теоретическая трудоемкость алгоритма: N*logN = {array.Columns * Math.Ceiling(Math.Log2(array.Columns))}");
@@ -157,7 +158,7 @@ internal class Program
         {
             if (array.Columns == Math.Pow(2, i))
             {
-                Console.WriteLine($"Число элементов в массиве = {array_1d.Length} = 2^k, добавлять элементы не требуется");
+                Console.WriteLine($"Число элементов в массиве = {array.Columns} = 2^k, добавлять элементы не требуется");
                 return 0;
             }
             else if (array.Columns < Math.Pow(2, i))
@@ -167,11 +168,11 @@ internal class Program
                 int Max = FindMax(array);
 
                 Console.WriteLine($"Число элементов в массиве = {prev_length} != 2^k, необходимо добавить {to_add}");          
-                array = CustomArray.ResizeCustomArray(array, prev_length + to_add);
+                array = CustomArray.ResizeArray(array, prev_length + to_add);
                 for (int j = 1; j <= to_add; j++)
                     array[prev_length - 1 + j] = Max + j;
                 Console.WriteLine("Результат:");
-                array.PrintCustomArray();
+                array.PrintArray();
 
                 return to_add;
             }
@@ -294,28 +295,28 @@ internal class Program
     #endregion
 
     #region Backpack
-    static void Backpack(CustomArray array)
-    {
-        //f - функция максимальной стоимости набора при данном весе
-        int[] backpack = new int[max_weight + 1];
-        List<int>[] items_sets = new List<int>[max_weight + 1];
+    static void Backpack(CustomArray array, int limit)
+    {        
+        int[] backpack = new int[limit + 1];
+        List<int>[] items_sets = new List<int>[limit + 1];
 
         backpack[0] = 0;
         items_sets[0] = [];
 
-        for (int i = 1; i <= max_weight; i++)
+        for (int i = 1; i <= limit; i++)
         {
-            int result = FindMaxCostAndFormItemsSet(backpack, i, ref items_sets);
+            int result = FindMaxCostAndFormItemsSet(array, backpack, i, ref items_sets);
             _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
         }
 
-        Console.WriteLine($"Максимальная стоимость набора: {backpack[max_weight]}");
+        Console.WriteLine($"Максимальная стоимость набора: {backpack[limit]}");
         Console.WriteLine("Положены товары:");
-        foreach (int item in items_sets[max_weight]) Console.WriteLine($"{array_2d[0, item]}, {array_2d[1, item]}");
+        foreach (int item in items_sets[limit]) Console.WriteLine($"{array[0, item]}, {array[1, item]}");
     }
 
-    static int FindMaxCostAndFormItemsSet(int[] backpack, int current_weight, ref List<int>[] items_sets)
+    static int FindMaxCostAndFormItemsSet(CustomArray array, int[] backpack, int current_weight, ref List<int>[] items_sets)
     {
+        //f - функция максимальной стоимости набора при данном весе
         int items_cost = -1;
         Union last_used_data = new()
         {
@@ -324,14 +325,14 @@ internal class Program
         };
         int f_index;
 
-        for (int i = 0; i < N_to_delete; i++)
+        for (int i = 0; i < array.Columns; i++)
         {
-            f_index = current_weight - array_2d[0, i];
+            f_index = current_weight - array[0, i];
             if (f_index >= 0)
             {
-                if (items_cost < backpack[f_index] + array_2d[1, i])
+                if (items_cost < backpack[f_index] + array[1, i])
                 {
-                    items_cost = backpack[f_index] + array_2d[1, i];
+                    items_cost = backpack[f_index] + array[1, i];
                     last_used_data.first = i;
                     last_used_data.second = f_index;
                 }
@@ -378,7 +379,29 @@ internal class Program
         else
             array = new(N, min, max);
 
-        array.PrintCustomArray();
+        array.PrintArray();
+
+        return array;
+    }
+    
+    static CustomArray PrepareTestArray(int choice) //примеры из методички
+    {
+        CustomArray array = new();
+
+        switch (choice)
+        {
+            case 6:
+                array = new(2, 3, true);
+                array.PrintArray();
+                break;
+
+            case 7:
+                break;
+
+            default:
+                Console.WriteLine("Для данного выбора нет тестовой задачи");
+                break;
+        }
 
         return array;
     }
@@ -390,11 +413,9 @@ internal class Program
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\nВыбор пункта: ");
-            string choice = Console.ReadLine();
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n\nВыбор пункта: ");
+            string? choice = Console.ReadLine();
             Console.WriteLine();
-
-            max_weight = 0;
 
             switch (choice)
             {
@@ -425,7 +446,19 @@ internal class Program
 
                 case "6":
                     Console.WriteLine("Рюкзак");
-                    Backpack(PrepareArray(true, false));
+                    Console.Write("Введите максимальный вес для рюкзака: ");
+                    int limit = Convert.ToInt16(Console.ReadLine());
+                    Backpack(PrepareArray(true, true), limit);
+                    break;
+
+                case "6.1":
+                    Console.WriteLine("Рюкзак");
+                    Backpack(PrepareTestArray(6), 23);
+                    break;
+
+                case "6.2":
+                    Console.WriteLine("Рюкзак");
+                    Backpack(PrepareTestArray(6), 24);
                     break;
 
                 case "7":
@@ -438,77 +471,7 @@ internal class Program
             }
             Console.ReadKey();
         }
-
-        void PrepareData(int choice)
-        {
-            //N = 0; M = 1; max_weight = 0;
-            //Console.Write("Введите N (количество столбцов): ");
-            //N = Convert.ToInt16(Console.ReadLine());
-
-            //Random random = new();
-            //int right_border, left_border;
-            //switch (positive)
-            //{
-            //    case false:
-            //        right_border = -10;
-            //        break;
-
-            //    case true:
-            //        right_border = 1;
-            //        break;
-            //}
-            //left_border = right_border + range;
-
-            //switch (choice)
-            //{
-            //    case 1:
-            //    case 2:
-            //    case 3:
-            //    case 4:
-            //        CustomArray array = new(N, right_border, left_border);
-            //        array.PrintCustomArray(output_width);
-            //        break;
-
-            //    case 5:
-            //    case 6:
-            //        if (choice == 6)
-            //        {
-            //            M = 2;
-            //            Console.Write("Максимальный вес: ");
-            //            max_weight = Convert.ToInt16(Console.ReadLine());
-            //            //пример из методички
-            //            //max_weight = 13;
-            //            //array_2d = new int[2, 3];
-            //            //array_2d[0, 0] = 3;
-            //            //array_2d[0, 1] = 5;
-            //            //array_2d[0, 2] = 8;
-            //            //array_2d[1, 0] = 8;
-            //            //array_2d[1, 1] = 14;
-            //            //array_2d[1, 2] = 23;
-            //            //break;
-            //        }
-            //        else
-            //        {
-            //            Console.Write("Введите M (количество строк): ");
-            //            M = Convert.ToInt16(Console.ReadLine());
-            //        }
-            //        Array.Clear(array_2d);
-            //        array_2d = new int[M, N];
-            //        for (int i = 0; i < M; i++)
-            //        {
-            //            for (int j = 0; j < N; j++)
-            //                array_2d[i, j] = random.Next(right_border, left_border);
-            //        }
-            //        //Print2DArray();
-            //        break;
-            //}
-        }
     }
 }
 
-//структура для парных значений
-struct Union
-{
-    public int first;
-    public int second;
-}
+
