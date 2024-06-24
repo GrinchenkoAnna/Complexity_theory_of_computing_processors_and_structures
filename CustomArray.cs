@@ -28,20 +28,12 @@ namespace Complexity_theory_of_computing_processors_and_structures
         public int Columns
         {
             get => columns;
-            set
-            {
-                if (value >= 0) columns = value;
-                else throw new ArgumentException("Недопустимый размер массива");
-            }
+            set => columns = value >= 0 ? value : throw new ArgumentException("Недопустимый размер массива");
         }
         public int Rows
         {
             get => rows;
-            set
-            {
-                if (value >= 0) rows = value;
-                else throw new ArgumentException("Недопустимый размер массива");
-            }
+            set => rows = value >= 0 ? value : throw new ArgumentException("Недопустимый размер массива");
         }
 
         public CustomArray() { }
@@ -66,7 +58,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             Columns = size2;
             custom_array2 = new int[Rows, Columns];
 
-            if (test)
+            if (test) //рюкзак
             {
                 custom_array2[0, 0] = 5;
                 custom_array2[0, 1] = 7;
@@ -106,7 +98,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     for (int i = 0; i < Rows; i++)
                     {
                         for (int j = 0; j < Columns; j++)
-                        { Console.Write($"{custom_array2[i, j]}".PadLeft(output_width)); }
+                            Console.Write($"{custom_array2[i, j]}".PadLeft(output_width));
                         Console.WriteLine();
                     }
                     break;
