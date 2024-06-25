@@ -7,7 +7,9 @@ using System.Runtime.InteropServices;
 
 internal class Program
 {
-    static int range = 20;                          //диапазон генерации
+    static int range_array = 20;                    //диапазон генерации (массив)
+    static int range_graph_vertices = 10;           //диапазон генерации (граф)
+    static int range_graph_weight = 10;             //диапазон генерации (графб веса)
     public struct Union                             //структура для парных значений
     {
         public int first;
@@ -368,7 +370,7 @@ internal class Program
         N = Convert.ToInt16(Console.ReadLine());
 
         _ = is_positive ? min = 1 : min = -10;
-        max = min + range;
+        max = min + range_array;
 
         if (is_two_dimensional)
         {
@@ -404,6 +406,14 @@ internal class Program
         }
 
         return array;
+    }
+
+    static CustomGraph PrepareGraph()
+    {
+        CustomGraph graph = new(range_graph_vertices, range_graph_weight);
+        graph.PrintGraph();
+
+        return graph;
     }
 
     private static void Main()
@@ -462,7 +472,8 @@ internal class Program
                     break;
 
                 case "7":
-                    Console.WriteLine("Флойд");                    
+                    Console.WriteLine("Флойд");
+                    PrepareGraph();
                     break;
 
                 case "0": return;

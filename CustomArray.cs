@@ -28,12 +28,12 @@ namespace Complexity_theory_of_computing_processors_and_structures
         public int Columns
         {
             get => columns;
-            set => columns = value >= 0 ? value : throw new ArgumentException("Недопустимый размер массива");
+            set => columns = value >= 0 ? value : throw new ArgumentException($"Недопустимое количество столбцов: {value}");
         }
         public int Rows
         {
             get => rows;
-            set => rows = value >= 0 ? value : throw new ArgumentException("Недопустимый размер массива");
+            set => rows = value >= 0 ? value : throw new ArgumentException($"Недопустимое количество строк: {value}");
         }
 
         public CustomArray() { }
@@ -46,9 +46,9 @@ namespace Complexity_theory_of_computing_processors_and_structures
         }
         public CustomArray(int size, int min, int max) : this(size)
         {
-            Random random = new();
+            Random random_arr = new();
             for (int i = 0; i < Columns; i++)
-                custom_array1[i] = random.Next(min, max);
+                custom_array1[i] = random_arr.Next(min, max);
         }
 
         public CustomArray(int size1, int size2, bool test = false)
