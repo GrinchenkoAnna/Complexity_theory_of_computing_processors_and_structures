@@ -11,6 +11,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         private int vertices;
         private int edges;
         private int?[,] adjacency;
+        public List<int>[,] weight_matrix; //0 - weight; 1 - промежуточная вершина, если есть
 
         readonly Random random_graph = new();
 
@@ -32,6 +33,10 @@ namespace Complexity_theory_of_computing_processors_and_structures
             Vertices = random_graph.Next(1, range_vertices);
             Edges = random_graph.Next(range_vertices);
             adjacency = new int?[Vertices, Vertices];
+            weight_matrix = new List<int>[Vertices, Vertices];
+            for (int i = 0; i < Vertices; i++)
+                for (int j = 0; j < Vertices; j++)
+                    weight_matrix[i, j] = [];
 
             int min_weight = random_graph.Next(range_weight);
             int max_weight = min_weight + range_weight;
@@ -59,13 +64,18 @@ namespace Complexity_theory_of_computing_processors_and_structures
         public void AddEdge(int start, int end, int weight, bool oriented)
         {
             adjacency[start, end] = weight;
+            weight_matrix[start, end].Add(weight);
             if (!oriented)
+            {
                 adjacency[end, start] = weight;
+                weight_matrix[end, start].Add(weight);
+            }                
         }
 
         public void RemoveEdge(int start, int end)
         {
             adjacency[start, end] = null;
+            weight_matrix[start, end].Clear();
         }
 
         public void AddVertice(int vertice)
@@ -122,6 +132,34 @@ namespace Complexity_theory_of_computing_processors_and_structures
                         Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
                     else 
                         Console.Write($"INF".PadLeft(output_width));
+                }
+                Console.WriteLine();
+            }
+        }
+
+        public void PrintWeightMatrix(int output_width = 5)
+        {
+            for (int i = 0; i < Vertices; i++)
+            {
+                for (int j = 0; j < Vertices; j++)
+                {
+                    switch (weight_matrix[i, j].Count)
+                    { 
+                        case 0:
+                            Console.Write($"INF".PadLeft(output_width));
+                            break;
+
+                        case 1:
+                            Console.Write($"{weight_matrix[i, j][0]}".PadLeft(output_width));
+                            break;
+
+                        case 2:
+                            Console.Write($"{weight_matrix[i, j][0]}({weight_matrix[i, j][1]})".PadLeft(output_width));
+                            break;
+
+                        default:
+                            throw new Exception("path overflow");
+                    }                    
                 }
                 Console.WriteLine();
             }
