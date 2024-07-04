@@ -30,8 +30,8 @@ namespace Complexity_theory_of_computing_processors_and_structures
 
         public CustomGraph(int range_vertices, int range_weight, bool oriented = false)
         {
-            Vertices = random_graph.Next(1, range_vertices);
-            Edges = random_graph.Next(range_vertices);
+            Vertices = random_graph.Next(3, range_vertices);
+            Edges = random_graph.Next(Vertices, ((Vertices - 1) * Vertices) / 2);
             adjacency = new int?[Vertices, Vertices];
             weight_matrix = new List<int>[Vertices, Vertices];
             for (int i = 0; i < Vertices; i++)
@@ -48,6 +48,11 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 int weight = random_graph.Next(min_weight, max_weight);
                 AddEdge(start, end, weight, oriented);
             }
+
+            for (int i = 0; i < Vertices; i++)
+                for (int j = 0; j < Vertices; j++)
+                    if (adjacency[i, j] != null)
+                        weight_matrix[i, j].Add((int)adjacency[i, j]);
         }
 
         public CustomGraph(int num_vertices, int num_edges, int min_weight, int max_weight, bool oriented = false)
@@ -64,12 +69,8 @@ namespace Complexity_theory_of_computing_processors_and_structures
         public void AddEdge(int start, int end, int weight, bool oriented)
         {
             adjacency[start, end] = weight;
-            weight_matrix[start, end].Add(weight);
             if (!oriented)
-            {
                 adjacency[end, start] = weight;
-                weight_matrix[end, start].Add(weight);
-            }                
         }
 
         public void RemoveEdge(int start, int end)
@@ -122,14 +123,37 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 throw new ArgumentException($"Такой вершины нет. Количество вершин: {Vertices}");
         }
 
-        public void PrintGraph(int output_width = 5)
+        public void PrintGraph(int output_width = 12)
         {
+            Console.Write("".PadLeft(output_width));
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"{0}");
+            for (int j = 1; j < Vertices; j++) Console.Write($"{j}".PadLeft(output_width));
+            Console.ResetColor();
+            Console.WriteLine();
+
             for (int i = 0; i < Vertices; i++)
             {
                 for (int j = 0; j < Vertices; j++)
                 {
+                    if (j == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.Write($"{i}");
+                        Console.ResetColor();
+                    }
+
                     if (adjacency[i, j] != null)
-                        Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                    {
+                        if (weight_matrix[i, j].Count == 2)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                            Console.ResetColor();
+                        }
+                        else if (weight_matrix[i, j].Count == 1)
+                            Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                    }                        
                     else 
                         Console.Write($"INF".PadLeft(output_width));
                 }
@@ -137,24 +161,40 @@ namespace Complexity_theory_of_computing_processors_and_structures
             }
         }
 
-        public void PrintWeightMatrix(int output_width = 5)
+        public void PrintWeightMatrix(int output_width = 12)
         {
+            Console.Write("".PadLeft(output_width));
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"{0}");
+            for (int j = 1; j < Vertices; j++) Console.Write($"{j}".PadLeft(output_width));
+            Console.ResetColor();
+            Console.WriteLine();
+
             for (int i = 0; i < Vertices; i++)
             {
                 for (int j = 0; j < Vertices; j++)
                 {
+                    if (j == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.Write($"{i}");
+                        Console.ResetColor();
+                    }
+                        
                     switch (weight_matrix[i, j].Count)
                     { 
                         case 0:
                             Console.Write($"INF".PadLeft(output_width));
                             break;
 
-                        case 1:
-                            Console.Write($"{weight_matrix[i, j][0]}".PadLeft(output_width));
+                        case 1:                            
+                            Console.Write($"{weight_matrix[i, j][0]}".PadLeft(output_width));                            
                             break;
 
                         case 2:
-                            Console.Write($"{weight_matrix[i, j][0]}({weight_matrix[i, j][1]})".PadLeft(output_width));
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write($"{weight_matrix[i, j][0]}(→в.{weight_matrix[i, j][1]})".PadLeft(output_width));
+                            Console.ResetColor();
                             break;
 
                         default:

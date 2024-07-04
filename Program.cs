@@ -9,7 +9,7 @@ internal class Program
 {
     static int range_array = 20;                    //диапазон генерации (массив)
     static int range_graph_vertices = 10;           //диапазон генерации (граф)
-    static int range_graph_weight = 10;             //диапазон генерации (граф, веса)
+    static int range_graph_weight = 10;              //диапазон генерации (граф, веса)
     public struct Union                             //структура для парных значений
     {
         public int first;
@@ -358,35 +358,45 @@ internal class Program
     static void Floyd(CustomGraph graph)
     {
         int N = graph.Vertices;
-
-        for (int k = 0; k < N; k++)
-            for (int i = 0; i < N; i++)
-                for (int j = 0; j < N; j++)
-                {
-                    if (graph.weight_matrix[i, k].Count * graph.weight_matrix[k, j].Count * graph.weight_matrix[i, j].Count != 0)
+        bool is_switched = false;
+        if (N > 1)
+        {
+            for (int k = 0; k < N; k++)
+                for (int i = 0; i < N; i++)
+                    for (int j = 0; j < N; j++)
                     {
-                        int indirect_way_weight = graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0];
-                        if (Math.Abs(indirect_way_weight) < Math.Abs(graph.weight_matrix[i, j][0]))
+                        if (graph.weight_matrix[i, k].Count != 0 && graph.weight_matrix[k, j].Count != 0 && graph.weight_matrix[i, j].Count != 0 && !(i == j && k == i))
                         {
-                            graph.weight_matrix[i, j][0] = indirect_way_weight;
-                            switch (graph.weight_matrix[i, j].Count)
+                            if (graph.weight_matrix[i, j][0] > graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0])
                             {
-                                case 0:
-                                    graph.weight_matrix[i, j].Add(k);
-                                    break;
-
-                                case 1:
-                                    graph.weight_matrix[i, j][1] = k;
-                                    break;
-
-                                default:
-                                    throw new Exception("path overflow");
+                                graph.weight_matrix[i, j][0] = graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0];
+                                is_switched = true;
                             }
-                        }                            
-                    }                    
-                }
 
-        Console.WriteLine();
+                            if (is_switched)
+                            {
+                                switch (graph.weight_matrix[i, j].Count)
+                                {
+                                    case 1:
+                                        graph.weight_matrix[i, j].Add(k);
+                                        break;
+
+                                    case 2:
+                                        graph.weight_matrix[i, j][1] = k;
+                                        break;
+
+                                    default:
+                                        throw new Exception("path overflow");
+                                }
+                            }
+                            is_switched = false;
+                        }
+                    }
+        }
+
+        Console.WriteLine("Матрица смежности:");
+        graph.PrintGraph();
+        Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
         graph.PrintWeightMatrix();
     }
     #endregion
@@ -441,8 +451,6 @@ internal class Program
     static CustomGraph PrepareGraph()
     {
         CustomGraph graph = new(range_graph_vertices, range_graph_weight);
-        graph.PrintGraph();
-
         return graph;
     }
 
