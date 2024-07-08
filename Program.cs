@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 
 internal class Program
 {
-    static int range_array = 20;                    //диапазон генерации (массив)
-    static int range_graph_vertices = 10;           //диапазон генерации (граф)
-    static int range_graph_weight = 10;              //диапазон генерации (граф, веса)
-    public struct Union                             //структура для парных значений
+    static readonly int range_array = 20;                    //диапазон генерации (массив)
+    static readonly int range_graph_vertices = 10;           //диапазон генерации (граф)
+    static readonly int range_graph_weight = 10;             //диапазон генерации (граф, веса)
+    public struct Union                                      //структура для парных значений
     {
         public int first;
         public int second;
@@ -357,8 +357,8 @@ internal class Program
     #region Floyd
     static void Floyd(CustomGraph graph)
     {
+        //Floyd-Warshall algorithm
         int N = graph.Vertices;
-        bool is_switched = false;
         if (N > 1)
         {
             for (int k = 0; k < N; k++)
@@ -367,14 +367,11 @@ internal class Program
                     {
                         if (graph.weight_matrix[i, k].Count != 0 && graph.weight_matrix[k, j].Count != 0 && graph.weight_matrix[i, j].Count != 0 && !(i == j && k == i))
                         {
-                            if (graph.weight_matrix[i, j][0] > graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0])
+                            int weight_ik_kj = graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0];
+                            if (graph.weight_matrix[i, j][0] > weight_ik_kj)
                             {
-                                graph.weight_matrix[i, j][0] = graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0];
-                                is_switched = true;
-                            }
+                                graph.weight_matrix[i, j][0] = weight_ik_kj;
 
-                            if (is_switched)
-                            {
                                 switch (graph.weight_matrix[i, j].Count)
                                 {
                                     case 1:
@@ -389,7 +386,6 @@ internal class Program
                                         throw new Exception("path overflow");
                                 }
                             }
-                            is_switched = false;
                         }
                     }
         }
@@ -398,9 +394,30 @@ internal class Program
         graph.PrintGraph();
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
         graph.PrintWeightMatrix();
+
+        LeadThePath(graph);
     }
     #endregion
 
+    #region Finding shortest path in graph
+    static void LeadThePath(CustomGraph graph)
+    {
+        Union start, end;
+        List<Union> path = [];
+
+        start = GeneratePathPoint(graph, 0);
+        end = GeneratePathPoint(graph, graph.Vertices);
+       
+        path.Add(end);
+        for (int i = graph.Vertices - 1; i >= start.first;)
+            for (int j = graph.Vertices - 1; j >= start.second;)
+            {
+
+            }
+    }
+    #endregion
+
+    #region Prepering Array
     static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
     {
         CustomArray array;
@@ -447,12 +464,56 @@ internal class Program
 
         return array;
     }
+    #endregion
 
+    #region Prepare Graph
     static CustomGraph PrepareGraph()
     {
         CustomGraph graph = new(range_graph_vertices, range_graph_weight);
         return graph;
     }
+
+    static Union GeneratePathPoint(CustomGraph graph, int target_vertex)
+    {
+        int direction, counter;        
+        Union point = new()
+        {
+            first = target_vertex,
+            second = target_vertex
+        };
+
+        _ = Math.Abs(target_vertex - graph.Vertices) >= Math.Abs(target_vertex) ? direction = 1 : direction = -1;
+        _ = direction > 0 ? counter = 0 : counter = graph.Vertices;
+
+        while (graph.weight_matrix[point.first, point.second].Count == 0)
+        {
+            counter = BypassTheVertex(counter, ref point, direction);
+            if (counter > graph.Vertices || counter < 0)
+                throw new Exception("unable to choose the vertex for the path");
+        }            
+
+        return point;
+    }
+
+    static int BypassTheVertex(int control, ref Union current_coords, int direction)
+    {
+        //сейчас идет перебор только возле 0.0. Сделать перебор конечной вершины (использовать direction)
+        if (current_coords.first > current_coords.second) //↓ ↑
+            current_coords.second++;
+        else                                               //← →
+        {
+            current_coords.first--;
+            if (current_coords.first < 0)
+            {
+                control++;
+                current_coords.first = control;
+                current_coords.second = 0;
+            }
+        }        
+
+        return control;
+    }
+    #endregion
 
     private static void Main()
     {
