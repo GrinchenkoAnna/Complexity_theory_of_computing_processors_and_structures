@@ -402,18 +402,7 @@ internal class Program
     #region Finding shortest path in graph
     static void LeadThePath(CustomGraph graph)
     {
-        Union start, end;
-        List<Union> path = [];
-
-        start = GeneratePathPoint(graph, 0);
-        end = GeneratePathPoint(graph, graph.Vertices);
-       
-        path.Add(end);
-        for (int i = graph.Vertices - 1; i >= start.first;)
-            for (int j = graph.Vertices - 1; j >= start.second;)
-            {
-
-            }
+        
     }
     #endregion
 
@@ -471,47 +460,6 @@ internal class Program
     {
         CustomGraph graph = new(range_graph_vertices, range_graph_weight);
         return graph;
-    }
-
-    static Union GeneratePathPoint(CustomGraph graph, int target_vertex)
-    {
-        int direction, counter;        
-        Union point = new()
-        {
-            first = target_vertex,
-            second = target_vertex
-        };
-
-        _ = Math.Abs(target_vertex - graph.Vertices) >= Math.Abs(target_vertex) ? direction = 1 : direction = -1;
-        _ = direction > 0 ? counter = 0 : counter = graph.Vertices;
-
-        while (graph.weight_matrix[point.first, point.second].Count == 0)
-        {
-            counter = BypassTheVertex(counter, ref point, direction);
-            if (counter > graph.Vertices || counter < 0)
-                throw new Exception("unable to choose the vertex for the path");
-        }            
-
-        return point;
-    }
-
-    static int BypassTheVertex(int control, ref Union current_coords, int direction)
-    {
-        //сейчас идет перебор только возле 0.0. Сделать перебор конечной вершины (использовать direction)
-        if (current_coords.first > current_coords.second) //↓ ↑
-            current_coords.second++;
-        else                                               //← →
-        {
-            current_coords.first--;
-            if (current_coords.first < 0)
-            {
-                control++;
-                current_coords.first = control;
-                current_coords.second = 0;
-            }
-        }        
-
-        return control;
     }
     #endregion
 
