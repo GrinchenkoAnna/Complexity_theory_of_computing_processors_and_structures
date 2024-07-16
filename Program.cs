@@ -7,10 +7,10 @@ using System.Runtime.InteropServices;
 
 internal class Program
 {
-    static readonly int range_array = 20;                    //диапазон генерации (массив)
-    static readonly int range_graph_vertices = 10;           //диапазон генерации (граф)
-    static readonly int range_graph_weight = 10;             //диапазон генерации (граф, веса)
-    public struct Union                                      //структура для парных значений
+    static int range_array = 20;                    //диапазон генерации (массив)
+    static int range_graph_vertices = 10;           //диапазон генерации (граф)
+    static int range_graph_weight = 10;              //диапазон генерации (граф, веса)
+    public struct Union                             //структура для парных значений
     {
         public int first;
         public int second;
@@ -357,8 +357,8 @@ internal class Program
     #region Floyd
     static void Floyd(CustomGraph graph)
     {
-        //Floyd-Warshall algorithm
         int N = graph.Vertices;
+        bool is_switched = false;
         if (N > 1)
         {
             for (int k = 0; k < N; k++)
@@ -367,11 +367,14 @@ internal class Program
                     {
                         if (graph.weight_matrix[i, k].Count != 0 && graph.weight_matrix[k, j].Count != 0 && graph.weight_matrix[i, j].Count != 0 && !(i == j && k == i))
                         {
-                            int weight_ik_kj = graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0];
-                            if (graph.weight_matrix[i, j][0] > weight_ik_kj)
+                            if (graph.weight_matrix[i, j][0] > graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0])
                             {
-                                graph.weight_matrix[i, j][0] = weight_ik_kj;
+                                graph.weight_matrix[i, j][0] = graph.weight_matrix[i, k][0] + graph.weight_matrix[k, j][0];
+                                is_switched = true;
+                            }
 
+                            if (is_switched)
+                            {
                                 switch (graph.weight_matrix[i, j].Count)
                                 {
                                     case 1:
@@ -386,6 +389,7 @@ internal class Program
                                         throw new Exception("path overflow");
                                 }
                             }
+                            is_switched = false;
                         }
                     }
         }
@@ -394,19 +398,9 @@ internal class Program
         graph.PrintGraph();
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
         graph.PrintWeightMatrix();
-
-        LeadThePath(graph);
     }
     #endregion
 
-    #region Finding shortest path in graph
-    static void LeadThePath(CustomGraph graph)
-    {
-        
-    }
-    #endregion
-
-    #region Prepering Array
     static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
     {
         CustomArray array;
@@ -453,15 +447,12 @@ internal class Program
 
         return array;
     }
-    #endregion
 
-    #region Prepare Graph
     static CustomGraph PrepareGraph()
     {
         CustomGraph graph = new(range_graph_vertices, range_graph_weight);
         return graph;
     }
-    #endregion
 
     private static void Main()
     {
