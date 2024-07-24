@@ -344,9 +344,9 @@ internal class Program
         if (last_used_data.first >= 0)
         {
             items_sets[current_weight] = new List<int>(items_sets[last_used_data.second])
-        {
-            last_used_data.first
-        };
+            {
+                last_used_data.first
+            };
         }
         else items_sets[current_weight] = [];
 
