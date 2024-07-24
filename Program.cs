@@ -395,10 +395,59 @@ internal class Program
         }
 
         Console.WriteLine("Матрица смежности:");
-        graph.PrintGraph();
+        graph.PrintGraph(5);
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
-        graph.PrintWeightMatrix();
+        graph.PrintWeightMatrix(5);
+
+        MakeTheWay(graph);
     }
+    #endregion
+
+    #region Path in graph
+    static void MakeTheWay(CustomGraph graph)
+    {
+        int start = 0;
+        int end = graph.Vertices - 1;
+        List<int>[] price = new List<int>[graph.Vertices];
+        bool has_edge = false;
+
+        for (int j = 0; j < graph.Vertices; j++)
+        {
+            price[j] =
+            [
+                int.MaxValue, //заменить на максимум из весов + 1
+                -1,
+            ];
+        }            
+
+        for (int j = 0; j < graph.Vertices;  j++)
+        {
+            has_edge = false;
+            for (int i = 0; i < graph.Vertices; i++)
+            {
+                if (graph.weight_matrix[i, j].Count != 0 && graph.weight_matrix[i, j][0] + price[i][0] < price[j][0])
+                {
+                    price[j][0] = graph.weight_matrix[i, j][0] + price[i][0];
+                    price[j][1] = i;
+                    has_edge = true;
+                }
+            }
+            if (has_edge == false)
+            {
+                price[j][0] = 0;
+                price[j].Remove(1);
+            }                
+        }
+
+        //убрать потом
+        Console.WriteLine("Price matrix: ");
+        for (int j = 0; j < graph.Vertices; j++)
+            Console.Write($"{price[j][0]}/{price[j][1]}  ");
+        Console.WriteLine();
+
+        //расчет пути: из акой вершины (второе значение в листе) была достигнута стоимость пути, от конца в начало
+    }
+
     #endregion
 
     static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
@@ -454,6 +503,12 @@ internal class Program
         return graph;
     }
 
+    static CustomGraph PrepareTestGraph()
+    {
+        CustomGraph graph = new();
+        return graph;
+    }
+
     private static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -461,7 +516,7 @@ internal class Program
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n\nВыбор пункта: ");
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест\n\nВыбор пункта: ");
             string? choice = Console.ReadLine();
             Console.WriteLine();
 
@@ -512,6 +567,11 @@ internal class Program
                 case "7":
                     Console.WriteLine("Флойд");
                     Floyd(PrepareGraph());
+                    break;
+
+                case "7.1":
+                    Console.WriteLine("Флойд");
+                    Floyd(PrepareTestGraph());
                     break;
 
                 case "0": return;

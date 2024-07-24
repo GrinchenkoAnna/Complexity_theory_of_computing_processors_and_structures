@@ -25,9 +25,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         {
             get => edges;
             set => edges = value >= 0 ? value : throw new ArgumentException($"Недопустимое количество ребер: {value}");
-        }        
-
-        public CustomGraph() { }
+        }  
 
         public CustomGraph(int range_vertices, int range_weight, bool oriented = false)
         {
@@ -47,6 +45,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                         weight_matrix[i, j].Add((int)adjacency[i, j]);            
         }
 
+        //пустой
         public CustomGraph(int num_vertices, int num_edges, int min_weight, int max_weight, bool oriented = false)
         {
             Vertices = num_vertices;
@@ -56,6 +55,51 @@ namespace Complexity_theory_of_computing_processors_and_structures
             for (int i = 0; i < Vertices; i++)
                 for (int j = 0; j < Vertices; j++)
                     adjacency[i, j] = null;
+        }
+        
+        //тест
+        public CustomGraph()
+        {
+            Vertices = 17;
+            Edges = 27;
+            adjacency = new int?[Vertices, Vertices];
+            weight_matrix = new List<int>[Vertices, Vertices];
+            for (int i = 0; i < Vertices; i++)
+                for (int j = 0; j < Vertices; j++)
+                    weight_matrix[i, j] = [];
+
+            adjacency[0, 1] = 4;
+            adjacency[0, 2] = 5;
+            adjacency[0, 3] = 6;
+            adjacency[1, 4] = 6;
+            adjacency[1, 5] = 8;
+            adjacency[1, 6] = 7;
+            adjacency[2, 6] = 8;
+            adjacency[2, 7] = 9;
+            adjacency[3, 6] = 6;
+            adjacency[3, 7] = 7;
+            adjacency[4, 8] = 4;
+            adjacency[5, 8] = 5;
+            adjacency[5, 9] = 5;
+            adjacency[6, 9] = 6;
+            adjacency[6, 10] = 5;
+            adjacency[6, 11] = 6;
+            adjacency[7, 10] = 4;
+            adjacency[7, 11] = 5;
+            adjacency[8, 12] = 7;
+            adjacency[9, 12] = 6;
+            adjacency[9, 13] = 8;
+            adjacency[10, 13] = 7;
+            adjacency[10, 14] = 6;
+            adjacency[11, 14] = 7;
+            adjacency[12, 15] = 9;
+            adjacency[13, 15] = 8;
+            adjacency[14, 16] = 7;
+
+            for (int i = 0; i < Vertices; i++)
+                for (int j = 0; j < Vertices; j++)
+                    if (adjacency[i, j] != null)
+                        weight_matrix[i, j].Add((int)adjacency[i, j]);
         }
 
         public void BuildSpanningTree(int range_weight, bool oriented = false)
@@ -170,7 +214,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         {
             Console.Write("".PadLeft(output_width));
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write($"{0}");
+            Console.Write($"{0}".PadLeft(output_width));
             for (int j = 1; j < Vertices; j++) Console.Write($"{j}".PadLeft(output_width));
             Console.ResetColor();
             Console.WriteLine();
@@ -182,7 +226,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     if (j == 0)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.Write($"{i}");
+                        Console.Write($"{i}".PadLeft(output_width));
                         Console.ResetColor();
                     }
 
@@ -208,7 +252,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         {
             Console.Write("".PadLeft(output_width));
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write($"{0}");
+            Console.Write($"{0}".PadLeft(output_width));
             for (int j = 1; j < Vertices; j++) Console.Write($"{j}".PadLeft(output_width));
             Console.ResetColor();
             Console.WriteLine();
@@ -220,7 +264,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     if (j == 0)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.Write($"{i}");
+                        Console.Write($"{i}".PadLeft(output_width));
                         Console.ResetColor();
                     }
                         
