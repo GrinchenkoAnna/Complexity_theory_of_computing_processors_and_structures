@@ -408,48 +408,79 @@ internal class Program
     {
         int start = 0;
         int end = graph.Vertices - 1;
-        List<int>[] price = new List<int>[graph.Vertices];
+
+        List<int>[] prices = CountPricesForVertices(graph);
+        List<int> path = [];
+
+        ////убрать потом
+        //Console.WriteLine();
+        //Console.WriteLine("Price matrix: ");
+        //for (int j = 0; j < graph.Vertices; j++)
+        //    Console.Write($"{prices[j][0]}/{prices[j][1]}  ");
+        //Console.WriteLine();
+        
+        path.Add(end);
+        for (int i = end; i > start;)
+        {
+            path.Add(prices[i][1]);
+            i = prices[i][1];
+        }
+        path.Reverse();
+
+        //Console.WriteLine();
+        //Console.WriteLine("Path: ");
+        //foreach (int step in path)
+        //    Console.Write($"{step}  ");
+        //Console.WriteLine();
+
+        Console.WriteLine($"\nКратчайший путь от вершины {start} до веришны {end}: ");
+        for (int i = 0; i < path.Count - 1; i++)
+            Console.Write($"{path[i]} → ");
+        Console.WriteLine($"{path.Last()}\n");
+
+        graph.PrintWeightMatrix(5, path);
+
+        Console.WriteLine($"\nМаксимальная стоитмость пути: {prices.Last()[0]}");
+    }
+
+    static List<int>[] CountPricesForVertices(CustomGraph graph)
+    {
+        List<int>[] prices = new List<int>[graph.Vertices];
         bool has_edge = false;
 
         for (int j = 0; j < graph.Vertices; j++)
         {
-            price[j] =
+            prices[j] =
             [
                 int.MaxValue, //заменить на максимум из весов + 1
                 -1,
             ];
-        }            
+        }
 
-        for (int j = 0; j < graph.Vertices;  j++)
+        for (int j = 0; j < graph.Vertices; j++)
         {
             has_edge = false;
             for (int i = 0; i < graph.Vertices; i++)
             {
-                if (graph.weight_matrix[i, j].Count != 0 && graph.weight_matrix[i, j][0] + price[i][0] < price[j][0])
+                if (graph.weight_matrix[i, j].Count != 0 && graph.weight_matrix[i, j][0] + prices[i][0] < prices[j][0])
                 {
-                    price[j][0] = graph.weight_matrix[i, j][0] + price[i][0];
-                    price[j][1] = i;
+                    prices[j][0] = graph.weight_matrix[i, j][0] + prices[i][0];
+                    prices[j][1] = i;
                     has_edge = true;
                 }
             }
             if (has_edge == false)
             {
-                price[j][0] = 0;
-                price[j].Remove(1);
-            }                
+                prices[j][0] = 0;
+                prices[j].Remove(1);
+            }
         }
 
-        //убрать потом
-        Console.WriteLine("Price matrix: ");
-        for (int j = 0; j < graph.Vertices; j++)
-            Console.Write($"{price[j][0]}/{price[j][1]}  ");
-        Console.WriteLine();
-
-        //расчет пути: из акой вершины (второе значение в листе) была достигнута стоимость пути, от конца в начало
+        return prices;
     }
-
     #endregion
 
+    #region Prepare Data
     static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
     {
         CustomArray array;
@@ -505,9 +536,10 @@ internal class Program
 
     static CustomGraph PrepareTestGraph()
     {
-        CustomGraph graph = new();
+        CustomGraph graph = new(true);
         return graph;
     }
+    #endregion
 
     private static void Main()
     {
