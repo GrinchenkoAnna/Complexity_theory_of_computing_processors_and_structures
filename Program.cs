@@ -395,9 +395,9 @@ internal class Program
         }
 
         Console.WriteLine("Матрица смежности:");
-        graph.PrintGraph(5);
+        graph.PrintGraph();
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
-        graph.PrintWeightMatrix(5);
+        graph.PrintWeightMatrix();
 
         MakeTheWay(graph);
     }
@@ -406,26 +406,27 @@ internal class Program
     #region Path in graph
     static void MakeTheWay(CustomGraph graph)
     {
+        //первая и последняя связные вершины
         int start = 0;
         int end = graph.Vertices - 1;
 
-        List<int>[] prices = CountPricesForVertices(graph);
+        List<int>[] prices = CountPricesForVertices(graph); //fix
         List<int> path = [];
 
-        ////убрать потом
-        //Console.WriteLine();
-        //Console.WriteLine("Price matrix: ");
-        //for (int j = 0; j < graph.Vertices; j++)
-        //    Console.Write($"{prices[j][0]}/{prices[j][1]}  ");
-        //Console.WriteLine();
-        
-        path.Add(end);
-        for (int i = end; i > start;)
-        {
-            path.Add(prices[i][1]);
-            i = prices[i][1];
-        }
-        path.Reverse();
+        //убрать потом
+        Console.WriteLine();
+        Console.WriteLine("Price matrix: ");
+        for (int j = 0; j < graph.Vertices; j++)
+            Console.Write($"{prices[j][0]}/{prices[j][1]}  ");
+        Console.WriteLine();
+
+        //path.Add(end);
+        //for (int i = end; i > start;)
+        //{            
+        //    path.Add(prices[i][1]);
+        //    i = prices[i][1];
+        //}
+        //path.Reverse();
 
         //Console.WriteLine();
         //Console.WriteLine("Path: ");
@@ -433,26 +434,37 @@ internal class Program
         //    Console.Write($"{step}  ");
         //Console.WriteLine();
 
-        Console.WriteLine($"\nКратчайший путь от вершины {start} до веришны {end}: ");
-        for (int i = 0; i < path.Count - 1; i++)
-            Console.Write($"{path[i]} → ");
-        Console.WriteLine($"{path.Last()}\n");
+        //Console.WriteLine($"\nКратчайший путь от вершины {start} до веришны {end}: ");
+        //for (int i = 0; i < path.Count - 1; i++)
+        //    Console.Write($"{path[i]} → ");
+        //Console.WriteLine($"{path.Last()}\n");
 
-        graph.PrintWeightMatrix(5, path);
+        //graph.PrintWeightMatrix(5, path);
 
-        Console.WriteLine($"\nМаксимальная стоитмость пути: {prices.Last()[0]}");
+        //Console.WriteLine($"\nМаксимальная стоитмость пути: {prices.Last()[0]}");
     }
 
     static List<int>[] CountPricesForVertices(CustomGraph graph)
     {
-        List<int>[] prices = new List<int>[graph.Vertices];
+        List<int>[] prices = new List<int>[graph.Vertices]; //0 - вес, 1 - вершина перед этим весом
         bool has_edge = false;
+        int max_weight = -int.MaxValue;
+
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            for (int j = 0; j < graph.Vertices; j++)
+            {
+                if (graph.weight_matrix[i, j].Count != 0 && graph.weight_matrix[i, j][0] > max_weight)
+                    max_weight = graph.weight_matrix[i, j][0];
+            }
+        }
+        max_weight++;
 
         for (int j = 0; j < graph.Vertices; j++)
         {
             prices[j] =
             [
-                int.MaxValue, //заменить на максимум из весов + 1
+                100*max_weight, 
                 -1,
             ];
         }
@@ -464,6 +476,7 @@ internal class Program
             {
                 if (graph.weight_matrix[i, j].Count != 0 && graph.weight_matrix[i, j][0] + prices[i][0] < prices[j][0])
                 {
+                    Console.WriteLine($"i = {i}, j = {j}, graph.weight_matrix[i, j][0] = {graph.weight_matrix[i, j][0]}, prices[i][0] = {prices[i][0]}, prices[j][0] = {prices[j][0]}, {graph.weight_matrix[i, j][0] + prices[i][0]} < {prices[j][0]}");
                     prices[j][0] = graph.weight_matrix[i, j][0] + prices[i][0];
                     prices[j][1] = i;
                     has_edge = true;
