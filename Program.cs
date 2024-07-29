@@ -395,9 +395,9 @@ internal class Program
         }
 
         Console.WriteLine("Матрица смежности:");
-        graph.PrintGraph();
+        graph.PrintGraph(5);
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
-        graph.PrintWeightMatrix();
+        graph.PrintWeightMatrix(5);
 
         MakeTheWay(graph);
     }
@@ -413,20 +413,22 @@ internal class Program
         List<int>[] prices = CountPricesForVertices(graph); //fix
         List<int> path = [];
 
-        //убрать потом
-        Console.WriteLine();
-        Console.WriteLine("Price matrix: ");
-        for (int j = 0; j < graph.Vertices; j++)
-            Console.Write($"{prices[j][0]}/{prices[j][1]}  ");
-        Console.WriteLine();
+        ////убрать потом
+        //Console.WriteLine();
+        //Console.WriteLine("Price matrix: ");
+        //for (int j = 0; j < graph.Vertices; j++)
+        //    Console.Write($"{j}:{prices[j][0]}/{prices[j][1]}  ");
+        //Console.WriteLine();
 
-        //path.Add(end);
-        //for (int i = end; i > start;)
-        //{            
-        //    path.Add(prices[i][1]);
-        //    i = prices[i][1];
-        //}
-        //path.Reverse();
+        path.Add(end);
+        for (int i = end; i > 0;)
+        {
+            path.Add(prices[i][1]);
+            i = prices[i][1];
+        }
+        path.Reverse();
+
+        start = path[0];
 
         //Console.WriteLine();
         //Console.WriteLine("Path: ");
@@ -434,19 +436,19 @@ internal class Program
         //    Console.Write($"{step}  ");
         //Console.WriteLine();
 
-        //Console.WriteLine($"\nКратчайший путь от вершины {start} до веришны {end}: ");
-        //for (int i = 0; i < path.Count - 1; i++)
-        //    Console.Write($"{path[i]} → ");
-        //Console.WriteLine($"{path.Last()}\n");
+        Console.WriteLine($"\nКратчайший путь от вершины {start} до вершины {end}: ");
+        for (int i = 0; i < path.Count - 1; i++)
+            Console.Write($"{path[i]} → ");
+        Console.WriteLine($"{path.Last()}\n");
 
-        //graph.PrintWeightMatrix(5, path);
+        graph.PrintWeightMatrix(5, path);
 
-        //Console.WriteLine($"\nМаксимальная стоитмость пути: {prices.Last()[0]}");
+        Console.WriteLine($"\nМаксимальная стоимость пути: {prices.Last()[0]}");
     }
 
     static List<int>[] CountPricesForVertices(CustomGraph graph)
     {
-        List<int>[] prices = new List<int>[graph.Vertices]; //0 - вес, 1 - вершина перед этим весом
+        List<int>[] prices = new List<int>[graph.Vertices]; //0 - вес, 1 - предыдущая вершина
         bool has_edge = false;
         int max_weight = -int.MaxValue;
 
@@ -460,32 +462,36 @@ internal class Program
         }
         max_weight++;
 
-        for (int j = 0; j < graph.Vertices; j++)
+        prices[0] = [ 0, 0 ];
+        for (int j = 1; j < graph.Vertices; j++)
         {
             prices[j] =
             [
-                100*max_weight, 
+                max_weight*20, 
                 -1,
             ];
         }
 
+        
         for (int j = 0; j < graph.Vertices; j++)
-        {
+        { 
             has_edge = false;
             for (int i = 0; i < graph.Vertices; i++)
             {
-                if (graph.weight_matrix[i, j].Count != 0 && graph.weight_matrix[i, j][0] + prices[i][0] < prices[j][0])
+                if (!(i == 0 && j == 0)
+                    && graph.weight_matrix[i, j].Count != 0 
+                    && graph.weight_matrix[i, j][0] + prices[i][0] < prices[j][0])
                 {
-                    Console.WriteLine($"i = {i}, j = {j}, graph.weight_matrix[i, j][0] = {graph.weight_matrix[i, j][0]}, prices[i][0] = {prices[i][0]}, prices[j][0] = {prices[j][0]}, {graph.weight_matrix[i, j][0] + prices[i][0]} < {prices[j][0]}");
+                    //Console.Write($"вес[{i}, {j}] = {graph.weight_matrix[i, j][0]}, цена[{i}] = {prices[i][0]}, цена[{j}] = {prices[j][0]}, {graph.weight_matrix[i, j][0] + prices[i][0]} < {prices[j][0]} ");
                     prices[j][0] = graph.weight_matrix[i, j][0] + prices[i][0];
                     prices[j][1] = i;
+                    //Console.WriteLine($"цена: {prices[j][0]}, пред.верш.: {prices[j][1]}");
                     has_edge = true;
                 }
-            }
+            }   
             if (has_edge == false)
             {
                 prices[j][0] = 0;
-                prices[j].Remove(1);
             }
         }
 
@@ -547,9 +553,9 @@ internal class Program
         return graph;
     }
 
-    static CustomGraph PrepareTestGraph()
+    static CustomGraph PrepareTestGraph(bool test1, bool test2)
     {
-        CustomGraph graph = new(true);
+        CustomGraph graph = new(test1, test2);
         return graph;
     }
     #endregion
@@ -561,7 +567,7 @@ internal class Program
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест\n\nВыбор пункта: ");
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n\nВыбор пункта: ");
             string? choice = Console.ReadLine();
             Console.WriteLine();
 
@@ -616,7 +622,12 @@ internal class Program
 
                 case "7.1":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph());
+                    Floyd(PrepareTestGraph(true, false));
+                    break;
+
+                case "7.2":
+                    Console.WriteLine("Флойд");
+                    Floyd(PrepareTestGraph(false, true));
                     break;
 
                 case "0": return;
