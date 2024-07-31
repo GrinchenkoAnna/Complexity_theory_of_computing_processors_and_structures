@@ -395,9 +395,9 @@ internal class Program
         }
 
         Console.WriteLine("Матрица смежности:");
-        graph.PrintGraph(5);
+        graph.PrintGraph(9);
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
-        graph.PrintWeightMatrix(5);
+        graph.PrintWeightMatrix(9);
 
         MakeTheWay(graph);
     }
@@ -423,10 +423,33 @@ internal class Program
         path.Add(end);
         for (int i = end; i > 0;)
         {
-            path.Add(prices[i][1]);
+            path.Add(prices[i][1]);            
             i = prices[i][1];
         }
         path.Reverse();
+
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            for (int j = 0; j < graph.Vertices; j++)
+            {
+                if (graph.weight_matrix[i, j].Count == 2)
+                {
+                    for (int k = 0; k < path.Count - 1; k++)
+                    {
+                        if (path[k] == i && path[k + 1] == j)
+                        {
+                            //Console.WriteLine($"i == {i}, j == {j}");
+                            //Console.WriteLine($"вставка вершины {graph.weight_matrix[i, j][1]} между {path[k]} и {path[k + 1]}");
+                            path.Insert(k + 1, graph.weight_matrix[i, j][1]);
+                            //foreach (var item in path) Console.WriteLine($"{item} ");
+                            //Console.WriteLine();
+                            //Console.ReadKey();
+                            break;
+                        }                            
+                    }
+                }
+            }
+        }
 
         start = path[0];
 
@@ -441,7 +464,7 @@ internal class Program
             Console.Write($"{path[i]} → ");
         Console.WriteLine($"{path.Last()}\n");
 
-        graph.PrintWeightMatrix(5, path);
+        graph.PrintWeightMatrix(9, path);
 
         Console.WriteLine($"\nМаксимальная стоимость пути: {prices.Last()[0]}");
     }

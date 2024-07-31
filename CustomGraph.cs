@@ -134,6 +134,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 adjacency[9, 13] = 8;
                 adjacency[10, 13] = 7;
                 adjacency[10, 14] = 6;
+                adjacency[10, 16] = 15;
                 adjacency[11, 14] = 7;
                 adjacency[12, 15] = 9;
                 adjacency[13, 15] = 8;
@@ -146,13 +147,29 @@ namespace Complexity_theory_of_computing_processors_and_structures
             }
             else if (test2 == true)
             {
-                Vertices = 9;
-                Edges = 15;
+                Vertices = 10;
+                Edges = 17;
                 adjacency = new int?[Vertices, Vertices];
                 weight_matrix = new List<int>[Vertices, Vertices];
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)
                         weight_matrix[i, j] = [];
+
+                //adjacency[0, 1] = 2;
+                //adjacency[0, 2] = 3;
+                //adjacency[0, 3] = 1;
+                //adjacency[1, 4] = 1;
+                //adjacency[1, 5] = 3;
+                //adjacency[2, 4] = 2;
+                //adjacency[2, 5] = 2;
+                //adjacency[2, 6] = 2;
+                //adjacency[3, 5] = 3;
+                //adjacency[3, 6] = 4;
+                //adjacency[4, 7] = 1;
+                //adjacency[5, 7] = 1;
+                //adjacency[5, 8] = 1;
+                //adjacency[6, 8] = 2;
+                //adjacency[7, 8] = 1;
 
                 adjacency[0, 1] = 2;
                 adjacency[0, 2] = 3;
@@ -164,11 +181,13 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 adjacency[2, 6] = 2;
                 adjacency[3, 5] = 3;
                 adjacency[3, 6] = 4;
-                adjacency[4, 7] = 1;
+                adjacency[4, 8] = 5;
                 adjacency[5, 7] = 1;
                 adjacency[5, 8] = 1;
-                adjacency[6, 8] = 2;
-                adjacency[7, 8] = 1;
+                adjacency[5, 9] = 3;
+                adjacency[6, 9] = 2;
+                adjacency[7, 9] = 1;
+                adjacency[8, 9] = 1;
 
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)
@@ -234,7 +253,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 throw new ArgumentException($"Такой вершины нет. Количество вершин: {Vertices}");
         }
 
-        public void PrintGraph(int output_width = 12)
+        public void PrintGraph(int output_width = 12, List<int> path = null)
         {
             Console.Write("".PadLeft(output_width));
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -242,6 +261,8 @@ namespace Complexity_theory_of_computing_processors_and_structures
             for (int j = 1; j < Vertices; j++) Console.Write($"{j}".PadLeft(output_width));
             Console.ResetColor();
             Console.WriteLine();
+
+            int path_index = 0;
 
             for (int i = 0; i < Vertices; i++)
             {
@@ -258,12 +279,32 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     {
                         if (weight_matrix[i, j].Count == 2)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
-                            Console.ResetColor();
+                            if (path == null)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                                Console.ResetColor();
+                            }
+                            else
+                                Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
                         }
                         else if (weight_matrix[i, j].Count == 1)
-                            Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                        {
+                            if (path != null && path_index < path.Count - 1)
+                            {
+                                if (i == path[path_index] && j == path[path_index + 1])
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Magenta;
+                                    Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                                    Console.ResetColor();
+                                    path_index++;
+                                }
+                                else
+                                    Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                            }
+                            else
+                                Console.Write($"{adjacency[i, j]}".PadLeft(output_width));
+                        }
                     }                        
                     else 
                         Console.Write($"INF".PadLeft(output_width));
