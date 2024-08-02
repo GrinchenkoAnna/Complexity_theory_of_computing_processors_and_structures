@@ -99,7 +99,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         #endregion
 
         //тест
-        public CustomGraph(bool test1, bool test2)
+        public CustomGraph(bool test1, bool test2, bool test3)
         {
             if (test1 == true)
             {
@@ -188,6 +188,29 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 adjacency[6, 9] = 2;
                 adjacency[7, 9] = 1;
                 adjacency[8, 9] = 1;
+
+                for (int i = 0; i < Vertices; i++)
+                    for (int j = 0; j < Vertices; j++)
+                        if (adjacency[i, j] != null)
+                            weight_matrix[i, j].Add((int)adjacency[i, j]);
+            }
+            else if (test3 == true)
+            {
+                Vertices = 5;
+                Edges = 7;
+                adjacency = new int?[Vertices, Vertices];
+                weight_matrix = new List<int>[Vertices, Vertices];
+                for (int i = 0; i < Vertices; i++)
+                    for (int j = 0; j < Vertices; j++)
+                        weight_matrix[i, j] = [];
+
+                adjacency[0, 1] = 25;
+                adjacency[0, 2] = 15;
+                adjacency[0, 3] = 7;
+                adjacency[0, 4``````] = 2;
+                adjacency[1, 2] = 6;
+                adjacency[2, 3] = 4;
+                adjacency[3, 4] = 3;
 
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)

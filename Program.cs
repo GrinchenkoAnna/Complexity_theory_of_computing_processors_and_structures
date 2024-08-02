@@ -9,7 +9,7 @@ internal class Program
 {
     static int range_array = 20;                    //диапазон генерации (массив)
     static int range_graph_vertices = 10;           //диапазон генерации (граф)
-    static int range_graph_weight = 10;              //диапазон генерации (граф, веса)
+    static int range_graph_weight = 10;             //диапазон генерации (граф, веса)
     public struct Union                             //структура для парных значений
     {
         public int first;
@@ -396,15 +396,15 @@ internal class Program
 
         Console.WriteLine("Матрица смежности:");
         graph.PrintGraph(9);
-        Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршалла:");
+        Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршелла:");
         graph.PrintWeightMatrix(9);
 
         MakeTheWay(graph);
     }
     #endregion
 
-    #region Path in graph
-    static void MakeTheWay(CustomGraph graph)
+    #region Path in graph (Floyd)
+    static void MakeTheWay(CustomGraph graph) //ввести переменную для graph.Vertices
     {
         //первая и последняя связные вершины
         int start = 0;
@@ -522,6 +522,61 @@ internal class Program
     }
     #endregion
 
+    #region Dijkstra
+    static void Dijkstra(CustomGraph graph)
+    {
+        List<int> S = [];
+        List<int> V = [];
+        int[] D = new int[graph.Vertices];
+
+        graph.PrintGraph();
+
+        for (int i = 0; i < graph.Vertices; i++)
+            V.Add(i);
+
+        S.Add(0);
+
+        D[0] = 0;
+        for (int j = 1; j < graph.Vertices; j++)
+            if (graph.weight_matrix[0, j] != null)
+                D[j] = graph.weight_matrix[0, j][0];
+
+        while (V.Count != 0)
+        {
+            int chosen_vertex = FindMin(D, S);
+            S.Add(chosen_vertex);
+            V.Remove(chosen_vertex);
+
+            for (int j = 1; j < graph.Vertices; j++)
+            {
+                if (graph.weight_matrix[0, j] != null)
+                {
+                    graph.weight_matrix[0, j][0] = Math.Min(D[j], graph.weight_matrix[0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]);
+                }
+            }
+        }
+
+        graph.PrintWeightMatrix();
+    }
+
+    static int FindMin(int[] array, List<int> S)
+    {
+        int min = array[1];
+        int min_index = 1;
+
+        for (int i = 1; i < array.Length; i++)
+        {
+            if (!S.Contains(i) && array[i] < min)
+            {
+                min = array[i];
+                min_index = i;
+            }
+        }
+
+        return min_index;
+    }
+    #endregion
+
     #region Prepare Data
     static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
     {
@@ -576,9 +631,9 @@ internal class Program
         return graph;
     }
 
-    static CustomGraph PrepareTestGraph(bool test1, bool test2)
+    static CustomGraph PrepareTestGraph(bool test1, bool test2, bool test3)
     {
-        CustomGraph graph = new(test1, test2);
+        CustomGraph graph = new(test1, test2, test3);
         return graph;
     }
     #endregion
@@ -590,7 +645,7 @@ internal class Program
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n\nВыбор пункта: ");
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n\nВыбор пункта: ");
             string? choice = Console.ReadLine();
             Console.WriteLine();
 
@@ -645,12 +700,22 @@ internal class Program
 
                 case "7.1":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph(true, false));
+                    Floyd(PrepareTestGraph(true, false, false));
                     break;
 
                 case "7.2":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph(false, true));
+                    Floyd(PrepareTestGraph(false, true, false));
+                    break;
+
+                case "8":
+                    Console.WriteLine("Дейкстра");
+                    Dijkstra(PrepareGraph());
+                    break;
+
+                case "8.1":
+                    Console.WriteLine("Дейкстра");
+                    Dijkstra(PrepareTestGraph(false, false, true));
                     break;
 
                 case "0": return;
