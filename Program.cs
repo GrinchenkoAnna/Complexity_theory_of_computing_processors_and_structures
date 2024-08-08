@@ -531,7 +531,7 @@ internal class Program
 
         graph.PrintGraph();
 
-        for (int i = 0; i < graph.Vertices; i++)
+        for (int i = 1; i < graph.Vertices; i++)
             V.Add(i);
 
         S.Add(0);
@@ -541,17 +541,40 @@ internal class Program
             if (graph.weight_matrix[0, j] != null)
                 D[j] = graph.weight_matrix[0, j][0];
 
+        //Console.WriteLine("D:");
+        //foreach (var d in D) Console.Write($"{d} ");
+        //Console.WriteLine();
+
         while (V.Count != 0)
         {
             int chosen_vertex = FindMin(D, S);
             S.Add(chosen_vertex);
             V.Remove(chosen_vertex);
 
+            //Console.WriteLine("S:");
+            //foreach (var s in S) Console.Write($"{s} ");
+            //Console.WriteLine();
+            //Console.WriteLine("V:");
+            //foreach (var v in V ) Console.Write($"{v} ");
+            //Console.WriteLine();
+
             for (int j = 1; j < graph.Vertices; j++)
             {
-                if (graph.weight_matrix[0, j] != null)
+                if (graph.weight_matrix[0, j].Count 
+                    * graph.weight_matrix[0, chosen_vertex].Count 
+                    * graph.weight_matrix[chosen_vertex, j].Count != 0)
                 {
-                    graph.weight_matrix[0, j][0] = Math.Min(D[j], graph.weight_matrix[0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]);
+                    D[j] = Math.Min(D[j], graph.weight_matrix[0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]);
+                    //Console.WriteLine($"D[{j}] = {D[j]}, [{0}, {chosen_vertex}] + [{chosen_vertex}, {j}] = {graph.weight_matrix[0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]}");
+                    graph.weight_matrix[0, j][0] = D[j];
+                }
+
+                if (graph.weight_matrix[j, 0].Count
+                    * graph.weight_matrix[j, chosen_vertex].Count
+                    * graph.weight_matrix[chosen_vertex, 0].Count != 0)
+                {
+                    D[j] = graph.weight_matrix[j, 0][0] = Math.Min(D[j], graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, 0][0]);
+                    graph.weight_matrix[j, 0][0] = D[j];
                 }
             }
         }
@@ -559,16 +582,16 @@ internal class Program
         graph.PrintWeightMatrix();
     }
 
-    static int FindMin(int[] array, List<int> S)
+    static int FindMin(int[] D, List<int> S)
     {
-        int min = array[1];
+        int min = D[1];
         int min_index = 1;
 
-        for (int i = 1; i < array.Length; i++)
+        for (int i = 1; i < D.Length; i++)
         {
-            if (!S.Contains(i) && array[i] < min)
+            if (!S.Contains(i) && D[i] < min)
             {
-                min = array[i];
+                min = D[i];
                 min_index = i;
             }
         }

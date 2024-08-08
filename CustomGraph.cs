@@ -111,34 +111,34 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     for (int j = 0; j < Vertices; j++)
                         weight_matrix[i, j] = [];
 
-                adjacency[0, 1] = 4;
-                adjacency[0, 2] = 5;
-                adjacency[0, 3] = 6;
-                adjacency[1, 4] = 6;
-                adjacency[1, 5] = 8;
-                adjacency[1, 6] = 7;
-                adjacency[2, 6] = 8;
-                adjacency[2, 7] = 9;
-                adjacency[3, 6] = 6;
-                adjacency[3, 7] = 7;
-                adjacency[4, 8] = 4;
-                adjacency[5, 8] = 5;
-                adjacency[5, 9] = 5;
-                adjacency[6, 9] = 6;
-                adjacency[6, 10] = 5;
-                adjacency[6, 11] = 6;
-                adjacency[7, 10] = 4;
-                adjacency[7, 11] = 5;
-                adjacency[8, 12] = 7;
-                adjacency[9, 12] = 6;
-                adjacency[9, 13] = 8;
-                adjacency[10, 13] = 7;
-                adjacency[10, 14] = 6;
-                adjacency[10, 16] = 15;
-                adjacency[11, 14] = 7;
-                adjacency[12, 15] = 9;
-                adjacency[13, 15] = 8;
-                adjacency[14, 16] = 7;
+                AddEdge(0, 1, 4);
+                AddEdge(0, 2, 5);
+                AddEdge(0, 3, 6);
+                AddEdge(1, 4, 6);
+                AddEdge(1, 5, 8);
+                AddEdge(1, 6, 7);
+                AddEdge(2, 6, 8);
+                AddEdge(2, 7, 9);
+                AddEdge(3, 6, 6);
+                AddEdge(3, 7, 7);
+                AddEdge(4, 8, 4);
+                AddEdge(5, 8, 5);
+                AddEdge(5, 9, 5);
+                AddEdge(6, 9, 6);
+                AddEdge(6, 10, 5);
+                AddEdge(6, 11, 6);
+                AddEdge(7, 10, 4);
+                AddEdge(7, 11, 5);
+                AddEdge(8, 12, 7);
+                AddEdge(9, 12, 6);
+                AddEdge(9, 13, 8);
+                AddEdge(10, 13, 7);
+                AddEdge(10, 14, 6);
+                AddEdge(10, 16, 15); //+
+                AddEdge(11, 14, 7);
+                AddEdge(12, 15, 9);
+                AddEdge(13, 15, 8);
+                AddEdge(14, 16, 7);
 
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)
@@ -155,39 +155,24 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     for (int j = 0; j < Vertices; j++)
                         weight_matrix[i, j] = [];
 
-                //adjacency[0, 1] = 2;
-                //adjacency[0, 2] = 3;
-                //adjacency[0, 3] = 1;
-                //adjacency[1, 4] = 1;
-                //adjacency[1, 5] = 3;
-                //adjacency[2, 4] = 2;
-                //adjacency[2, 5] = 2;
-                //adjacency[2, 6] = 2;
-                //adjacency[3, 5] = 3;
-                //adjacency[3, 6] = 4;
-                //adjacency[4, 7] = 1;
-                //adjacency[5, 7] = 1;
-                //adjacency[5, 8] = 1;
-                //adjacency[6, 8] = 2;
-                //adjacency[7, 8] = 1;
-
-                adjacency[0, 1] = 2;
-                adjacency[0, 2] = 3;
-                adjacency[0, 3] = 1;
-                adjacency[1, 4] = 1;
-                adjacency[1, 5] = 3;
-                adjacency[2, 4] = 2;
-                adjacency[2, 5] = 2;
-                adjacency[2, 6] = 2;
-                adjacency[3, 5] = 3;
-                adjacency[3, 6] = 4;
-                adjacency[4, 8] = 5;
-                adjacency[5, 7] = 1;
-                adjacency[5, 8] = 1;
-                adjacency[5, 9] = 3;
-                adjacency[6, 9] = 2;
-                adjacency[7, 9] = 1;
-                adjacency[8, 9] = 1;
+                AddEdge(0, 1, 2);
+                AddEdge(0, 2, 3);
+                AddEdge(0, 3, 1);
+                AddEdge(1, 4, 1);
+                AddEdge(1, 5, 3);
+                AddEdge(2, 4, 2);
+                AddEdge(2, 5, 2);
+                AddEdge(2, 6, 2);
+                AddEdge(3, 5, 3);
+                AddEdge(3, 5, 4);
+                AddEdge(3, 5, 4);
+                AddEdge(4, 8, 5);
+                AddEdge(5, 7, 1);
+                AddEdge(5, 8, 1);
+                AddEdge(5, 9, 3);
+                AddEdge(6, 9, 2);
+                AddEdge(7, 9, 1);
+                AddEdge(8, 9, 1);
 
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)
@@ -204,13 +189,13 @@ namespace Complexity_theory_of_computing_processors_and_structures
                     for (int j = 0; j < Vertices; j++)
                         weight_matrix[i, j] = [];
 
-                adjacency[0, 1] = 25;
-                adjacency[0, 2] = 15;
-                adjacency[0, 3] = 7;
-                adjacency[0, 4``````] = 2;
-                adjacency[1, 2] = 6;
-                adjacency[2, 3] = 4;
-                adjacency[3, 4] = 3;
+                AddEdge(0, 1, 25);
+                AddEdge(0, 2, 15);
+                AddEdge(0, 3, 7);
+                AddEdge(0, 4, 2);
+                AddEdge(1, 2, 6);
+                AddEdge(2, 3, 4);
+                AddEdge(3, 4, 3);
 
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)
@@ -219,7 +204,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             }
         }        
 
-        public void AddEdge(int start, int end, int weight, bool oriented)
+        public void AddEdge(int start, int end, int weight, bool oriented = false)
         {
             adjacency[start, end] = weight;
             if (!oriented)
@@ -382,24 +367,26 @@ namespace Complexity_theory_of_computing_processors_and_structures
                             break;
 
                         case 2:
-                            if (path != null && path_index < path.Count - 1)
+                            if (path != null)
                             {
-                                if (i == path[path_index] && j == path[path_index + 1])
+                                if (path_index < path.Count - 1 
+                                    && i == path[path_index] 
+                                    && j == path[path_index + 1])
                                 {
                                     Console.ForegroundColor = ConsoleColor.Magenta;
-                                    Console.Write($"{weight_matrix[i, j][0]}(→в.{weight_matrix[i, j][1]})".PadLeft(output_width));
+                                    Console.Write($"{weight_matrix[i, j][0]}".PadLeft(output_width));
                                     Console.ResetColor();
                                     path_index++;
                                 }
                                 else
                                     Console.Write($"{weight_matrix[i, j][0]}".PadLeft(output_width));
                             }
-                            else
+                            else 
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 Console.Write($"{weight_matrix[i, j][0]}(→в.{weight_matrix[i, j][1]})".PadLeft(output_width));
                                 Console.ResetColor();
-                            }                                
+                            }
                             break;
 
                         default:
