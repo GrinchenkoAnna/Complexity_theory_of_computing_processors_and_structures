@@ -98,8 +98,8 @@ namespace Complexity_theory_of_computing_processors_and_structures
         }
         #endregion
 
-        //тест
-        public CustomGraph(bool test1, bool test2, bool test3)
+        //тесты
+        public CustomGraph(bool test1, bool test2, bool test3, bool test4)
         {
             if (test1 == true)
             {
@@ -196,6 +196,50 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 AddEdge(1, 2, 6);
                 AddEdge(2, 3, 4);
                 AddEdge(3, 4, 3);
+
+                for (int i = 0; i < Vertices; i++)
+                    for (int j = 0; j < Vertices; j++)
+                        if (adjacency[i, j] != null)
+                            weight_matrix[i, j].Add((int)adjacency[i, j]);
+            }
+            else if (test4 == true)
+            {
+                Vertices = 6;
+                Edges = 27;
+                adjacency = new int?[Vertices, Vertices];
+                weight_matrix = new List<int>[Vertices, Vertices];
+                for (int i = 0; i < Vertices; i++)
+                    for (int j = 0; j < Vertices; j++)
+                        weight_matrix[i, j] = [];
+
+                AddEdge(0, 0, 0);
+                AddEdge(0, 1, 2, true);
+                AddEdge(0, 2, 7, true);
+                AddEdge(0, 3, 4);
+                AddEdge(0, 4, 6, true);
+                AddEdge(0, 5, 3, true);
+                AddEdge(1, 0, 3, true);
+                AddEdge(1, 1, 0);
+                AddEdge(1, 2, 4);
+                AddEdge(1, 3, 5, true);
+                AddEdge(1, 4, 6, true);
+                AddEdge(1, 5, 1, true);
+                AddEdge(2, 0, 2, true);
+                AddEdge(2, 2, 0);
+                AddEdge(2, 3, 8);
+                AddEdge(2, 4, 7, true);
+                AddEdge(3, 3, 0);
+                AddEdge(3, 4, 5, true);
+                AddEdge(3, 5, 7);
+                AddEdge(4, 1, 7, true);
+                AddEdge(4, 2, 8, true);
+                AddEdge(4, 3, 4, true);
+                AddEdge(4, 4, 0);
+                AddEdge(4, 5, 3, true);
+                AddEdge(5, 0, 2, true);
+                AddEdge(5, 1, 4, true);
+                AddEdge(5, 4, 8, true);
+                AddEdge(5, 5, 0);
 
                 for (int i = 0; i < Vertices; i++)
                     for (int j = 0; j < Vertices; j++)

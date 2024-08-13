@@ -523,73 +523,150 @@ internal class Program
     #endregion
 
     #region Dijkstra
-    static void Dijkstra(CustomGraph graph)
+    static void Dijkstra(CustomGraph graph, int v0)
     {
         List<int> S = [];
         List<int> V = [];
         int[] D = new int[graph.Vertices];
+        int chosen_vertex = v0;
 
-        graph.PrintGraph();
-
-        for (int i = 1; i < graph.Vertices; i++)
-            V.Add(i);
-
-        S.Add(0);
-
-        D[0] = 0;
-        for (int j = 1; j < graph.Vertices; j++)
-            if (graph.weight_matrix[0, j] != null)
-                D[j] = graph.weight_matrix[0, j][0];
-
-        //Console.WriteLine("D:");
-        //foreach (var d in D) Console.Write($"{d} ");
-        //Console.WriteLine();
-
-        while (V.Count != 0)
+        for (int i = 0; i < graph.Vertices; i++)
         {
-            int chosen_vertex = FindMin(D, S);
-            S.Add(chosen_vertex);
-            V.Remove(chosen_vertex);
+            if (i == v0) 
+                continue;
+            else
+                V.Add(i);
+        }
+        S.Add(v0);
+        D[v0] = 0;       
+        for (int j = 0; j < graph.Vertices; j++)
+        {
+            if (j == v0)
+                continue;
+            else if (graph.weight_matrix[v0, j].Count != 0)
+                D[j] = graph.weight_matrix[v0, j][0];
+            else 
+                D[j] = int.MaxValue;
+        }
 
-            //Console.WriteLine("S:");
-            //foreach (var s in S) Console.Write($"{s} ");
-            //Console.WriteLine();
-            //Console.WriteLine("V:");
-            //foreach (var v in V ) Console.Write($"{v} ");
-            //Console.WriteLine();
+        #region print
+        Console.Write("S".PadRight(graph.Vertices * 2));
+        Console.Write("| w".PadRight(5));
+        Console.Write("|D(w)".PadRight(5));
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            if (i == v0)
+                continue;
+            else
+                Console.Write($"| D({i})".PadRight(5));
+        }
+        Console.WriteLine();
+        #endregion
 
-            for (int j = 1; j < graph.Vertices; j++)
+        int iter = V.Count + 1;
+        while (iter != 0)
+        {
+            #region print
+            foreach (int s in S) Console.Write($"{s} ");
+            Console.Write("".PadRight(graph.Vertices * 2 - S.Count * 2)); 
+            if (chosen_vertex == v0)
             {
-                if (graph.weight_matrix[0, j].Count 
-                    * graph.weight_matrix[0, chosen_vertex].Count 
+                Console.Write($"| -".PadRight(5));
+                Console.Write($"| -".PadRight(5));
+            }                
+            else
+            {
+                Console.Write($"| {chosen_vertex}".PadRight(5));
+                Console.Write($"| {D[chosen_vertex]}".PadRight(5));
+            }         
+            #endregion
+
+            chosen_vertex = FindMin(D, S, V, v0);
+            if (!S.Contains(chosen_vertex))
+                S.Add(chosen_vertex);
+
+            #region print
+            for (int j = 0; j < graph.Vertices; j++)
+            {
+                if (j == v0)
+                    continue;
+                else if (!S.Contains(j))
+                {
+                    if (D[j] != int.MaxValue)
+                        Console.Write($"| {D[j]}".PadRight(6));
+                    else
+                        Console.Write("| INF".PadRight(6));
+                }                    
+
+                else if (S.Last() == j && V.Count > 0)
+                {
+                    Console.Write("| ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"{D[j]}".PadRight(4));
+                    Console.ResetColor();
+                }
+                else
+                    Console.Write($"| -".PadRight(6));
+            }
+            Console.WriteLine();
+            #endregion         
+
+            for (int j = 0; j < graph.Vertices; j++)
+            {
+                if (graph.weight_matrix[v0, chosen_vertex].Count 
                     * graph.weight_matrix[chosen_vertex, j].Count != 0)
                 {
-                    D[j] = Math.Min(D[j], graph.weight_matrix[0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]);
-                    //Console.WriteLine($"D[{j}] = {D[j]}, [{0}, {chosen_vertex}] + [{chosen_vertex}, {j}] = {graph.weight_matrix[0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]}");
-                    graph.weight_matrix[0, j][0] = D[j];
+                    D[j] = Math.Min(D[j], graph.weight_matrix[v0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]);
+                    if (graph.weight_matrix[v0, j].Count != 0)
+                        graph.weight_matrix[v0, j][0] = D[j];
+                    else
+                        graph.weight_matrix[v0, j].Add(D[j]);
                 }
 
-                if (graph.weight_matrix[j, 0].Count
-                    * graph.weight_matrix[j, chosen_vertex].Count
-                    * graph.weight_matrix[chosen_vertex, 0].Count != 0)
-                {
-                    D[j] = graph.weight_matrix[j, 0][0] = Math.Min(D[j], graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, 0][0]);
-                    graph.weight_matrix[j, 0][0] = D[j];
-                }
+                // если неорграф - это должно запускаться!! добавить параметр
+                //if (graph.weight_matrix[j, 0].Count
+                //    * graph.weight_matrix[j, chosen_vertex].Count
+                //    * graph.weight_matrix[chosen_vertex, 0].Count != 0)
+                //{
+                //    D[j] = Math.Min(D[j], graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, 0][0]); 
+                //    graph.weight_matrix[j, 0][0] = D[j];
+                //}
             }
+
+            V.Remove(chosen_vertex);
+            iter--;
         }
+        Console.WriteLine();
 
         graph.PrintWeightMatrix();
     }
 
-    static int FindMin(int[] D, List<int> S)
+    static int FindMin(int[] D, List<int> S, List<int> V, int v0)
     {
-        int min = D[1];
-        int min_index = 1;
 
-        for (int i = 1; i < D.Length; i++)
+        if (V.Count == 1)
+            return V.Last();
+
+        int min = 0;        
+        int min_index = 0;
+        
+        for (int i = 0; i < D.Length; i++)
         {
-            if (!S.Contains(i) && D[i] < min)
+            if (i == v0)
+                continue;
+            else if (!S.Contains(i) && D[i] > 0)
+            {
+                min = D[i];
+                min_index = i;
+                break;
+            }
+        } 
+
+        for (int i = 0; i < D.Length; i++)
+        {
+            if (i == v0)
+                continue;
+            else if (!S.Contains(i) && D[i] < min && D[i] > 0)
             {
                 min = D[i];
                 min_index = i;
@@ -651,24 +728,28 @@ internal class Program
     static CustomGraph PrepareGraph()
     {
         CustomGraph graph = new(range_graph_vertices, range_graph_weight);
+        graph.PrintGraph();
+        Console.WriteLine();
         return graph;
     }
 
-    static CustomGraph PrepareTestGraph(bool test1, bool test2, bool test3)
+    static CustomGraph PrepareTestGraph(bool test1, bool test2, bool test3, bool test4)
     {
-        CustomGraph graph = new(test1, test2, test3);
+        CustomGraph graph = new(test1, test2, test3, test4);
+        graph.PrintGraph();
+        Console.WriteLine();
         return graph;
     }
     #endregion
 
-    private static void Main()
+    static void Main()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n7) Флойд\n8) Дейкстра\n9) Форд-Беллман\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n\nВыбор пункта: ");
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n8.2) Дейкстра тест 2\n\nВыбор пункта: ");
             string? choice = Console.ReadLine();
             Console.WriteLine();
 
@@ -716,29 +797,24 @@ internal class Program
                     Backpack(PrepareTestArray(6), 24);
                     break;
 
-                case "7":
-                    Console.WriteLine("Флойд");
-                    Floyd(PrepareGraph());
-                    break;
-
                 case "7.1":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph(true, false, false));
+                    Floyd(PrepareTestGraph(true, false, false, false));
                     break;
 
                 case "7.2":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph(false, true, false));
-                    break;
-
-                case "8":
-                    Console.WriteLine("Дейкстра");
-                    Dijkstra(PrepareGraph());
+                    Floyd(PrepareTestGraph(false, true, false, false));
                     break;
 
                 case "8.1":
                     Console.WriteLine("Дейкстра");
-                    Dijkstra(PrepareTestGraph(false, false, true));
+                    Dijkstra(PrepareTestGraph(false, false, true, false), 0);
+                    break;
+
+                case "8.2":
+                    Console.WriteLine("Дейкстра");
+                    Dijkstra(PrepareTestGraph(false, false, false, true), 2);
                     break;
 
                 case "0": return;
