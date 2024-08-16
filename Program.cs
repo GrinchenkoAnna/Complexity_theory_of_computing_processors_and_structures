@@ -528,6 +528,7 @@ internal class Program
         List<int> S = [];
         List<int> V = [];
         int[] D = new int[graph.Vertices];
+        List<int>[] paths = new List<int>[graph.Vertices];
         int chosen_vertex = v0;
 
         for (int i = 0; i < graph.Vertices; i++)
@@ -616,21 +617,48 @@ internal class Program
                 if (graph.weight_matrix[v0, chosen_vertex].Count 
                     * graph.weight_matrix[chosen_vertex, j].Count != 0)
                 {
-                    D[j] = Math.Min(D[j], graph.weight_matrix[v0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0]);
-                    if (graph.weight_matrix[v0, j].Count != 0)
-                        graph.weight_matrix[v0, j][0] = D[j];
-                    else
-                        graph.weight_matrix[v0, j].Add(D[j]);
+                    if (D[j] > graph.weight_matrix[v0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0])
+                    {
+                        D[j] = graph.weight_matrix[v0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0];
+                        if (graph.weight_matrix[v0, j].Count != 0)
+                            graph.weight_matrix[v0, j][0] = D[j];
+                        else
+                            graph.weight_matrix[v0, j].Add(D[j]);
+
+                        if (graph.weight_matrix[v0, j].Count == 1)
+                            graph.weight_matrix[v0, j].Add(chosen_vertex);
+                        else if (graph.weight_matrix[v0, j].Count == 2)
+                            graph.weight_matrix[v0, j][1] = chosen_vertex;
+                    }                    
                 }
 
-                // если неорграф - это должно запускаться!! добавить параметр
-                //if (graph.weight_matrix[j, 0].Count
-                //    * graph.weight_matrix[j, chosen_vertex].Count
-                //    * graph.weight_matrix[chosen_vertex, 0].Count != 0)
+                if (!graph.Oriented)
+                {
+                    if (graph.weight_matrix[v0, chosen_vertex].Count
+                        * graph.weight_matrix[chosen_vertex, j].Count != 0)
+                    {
+                        if (D[j] > graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, v0][0])
+                        {
+                            D[j] = graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, v0][0];
+                            if (graph.weight_matrix[j, v0].Count != 0)
+                                graph.weight_matrix[j, v0][0] = D[j];
+                            else
+                                graph.weight_matrix[j, v0].Add(D[j]);
+
+                            if (graph.weight_matrix[v0, j].Count == 1)
+                                graph.weight_matrix[v0, j].Add(chosen_vertex);
+                            else if (graph.weight_matrix[v0, j].Count == 2)
+                                graph.weight_matrix[v0, j][1] = chosen_vertex;
+                        }                            
+                    }
+                }                  
+               
+                //Console.WriteLine($"j = {j}");
+                //for (int i = 0; i < graph.weight_matrix[v0, j].Count; i++)
                 //{
-                //    D[j] = Math.Min(D[j], graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, 0][0]); 
-                //    graph.weight_matrix[j, 0][0] = D[j];
+                //    Console.Write($"{graph.weight_matrix[v0, j][i]} ");
                 //}
+                //Console.WriteLine();
             }
 
             V.Remove(chosen_vertex);
@@ -638,7 +666,21 @@ internal class Program
         }
         Console.WriteLine();
 
-        graph.PrintWeightMatrix();
+        //пути
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            paths[i] = [];
+            if (i != v0)
+            {
+                paths[i] = PathToAnotherVertices(graph, i, v0);
+                Console.WriteLine($"\nКратчайший путь от вершины {v0} до вершины {i}: ");
+                for (int k = 0; k < paths[i].Count - 1; k++)
+                    Console.Write($"{paths[i][k]} → ");
+                Console.WriteLine($"{paths[i].Last()}");
+            }                
+            else
+                paths[i].Add(v0);           
+        }
     }
 
     static int FindMin(int[] D, List<int> S, List<int> V, int v0)
@@ -674,6 +716,38 @@ internal class Program
         }
 
         return min_index;
+    }
+
+    static List<int> PathToAnotherVertices(CustomGraph graph, int i, int v0)
+    {
+        List<int> path = [];
+        List<int> local_path = [];
+            
+        if (i == v0)
+            path.Add(v0);
+        else
+        {
+            path.Add(v0);
+            //if (graph.weight_matrix[v0, i].Count == 2 && graph.weight_matrix[v0, i][1] != i)
+            //{
+            //    int t = graph.weight_matrix[v0, i][1];                
+            //    if (graph.weight_matrix[v0, t].Count == 2 && graph.weight_matrix[v0, t][1] != i)
+            //    {
+            //        int p = graph.weight_matrix[v0, t][1];
+            //        if (graph.weight_matrix[v0, p].Count == 2 && graph.weight_matrix[v0, p][1] != i)
+            //        {
+            //            path.Add(graph.weight_matrix[v0, p][1]);
+            //        }
+            //        path.Add(graph.weight_matrix[v0, t][1]);
+            //    }
+            //    path.Add(graph.weight_matrix[v0, i][1]);
+            //}
+            if (graph.weight_matrix[v0, i].Count == 2 && graph.weight_matrix[v0, i][1] != i)
+                path.Add(graph.weight_matrix[v0, i][1]);
+            path.Add(i);
+        }
+
+        return path;
     }
     #endregion
 

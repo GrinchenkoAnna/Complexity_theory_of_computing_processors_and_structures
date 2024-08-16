@@ -11,6 +11,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
     {
         private int vertices;
         private int edges;
+        private bool oriented;
         private int?[,] adjacency;
         public List<int>[,] weight_matrix; //0 - weight; 1 - промежуточная вершина, если есть
 
@@ -25,6 +26,12 @@ namespace Complexity_theory_of_computing_processors_and_structures
         {
             get => edges;
             set => edges = value >= 0 ? value : throw new ArgumentException($"Недопустимое количество ребер: {value}");
+        }
+
+        public bool Oriented
+        {
+            get => oriented;
+            set => oriented = value;
         }
 
         #region Generation of Graph
@@ -105,6 +112,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             {
                 Vertices = 17;
                 Edges = 27;
+                Oriented = false;
                 adjacency = new int?[Vertices, Vertices];
                 weight_matrix = new List<int>[Vertices, Vertices];
                 for (int i = 0; i < Vertices; i++)
@@ -149,6 +157,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             {
                 Vertices = 10;
                 Edges = 17;
+                Oriented = false;
                 adjacency = new int?[Vertices, Vertices];
                 weight_matrix = new List<int>[Vertices, Vertices];
                 for (int i = 0; i < Vertices; i++)
@@ -183,6 +192,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             {
                 Vertices = 5;
                 Edges = 7;
+                Oriented = false;
                 adjacency = new int?[Vertices, Vertices];
                 weight_matrix = new List<int>[Vertices, Vertices];
                 for (int i = 0; i < Vertices; i++)
@@ -206,6 +216,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
             {
                 Vertices = 6;
                 Edges = 27;
+                Oriented = true;
                 adjacency = new int?[Vertices, Vertices];
                 weight_matrix = new List<int>[Vertices, Vertices];
                 for (int i = 0; i < Vertices; i++)
@@ -225,6 +236,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 AddEdge(1, 4, 6, true);
                 AddEdge(1, 5, 1, true);
                 AddEdge(2, 0, 2, true);
+                AddEdge(2, 1, 4, true);
                 AddEdge(2, 2, 0);
                 AddEdge(2, 3, 8);
                 AddEdge(2, 4, 7, true);
@@ -251,7 +263,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         public void AddEdge(int start, int end, int weight, bool oriented = false)
         {
             adjacency[start, end] = weight;
-            if (!oriented)
+            if (!Oriented)
                 adjacency[end, start] = weight;
         }
 
