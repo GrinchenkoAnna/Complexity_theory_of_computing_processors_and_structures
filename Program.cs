@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 
-internal class Program
+internal partial class Program
 {
     static int range_array = 20;                    //диапазон генерации (массив)
     static int range_graph_vertices = 10;           //диапазон генерации (граф)
@@ -307,7 +307,7 @@ internal class Program
 
         for (int i = 1; i <= limit; i++)
         {
-            int result = FindMaxCostAndFormItemsSet(array, backpack, i, ref items_sets);
+            int result = FindMaxCostAndFormItemsSet(ref array, ref backpack, i, ref items_sets);
             _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
         }
 
@@ -316,7 +316,7 @@ internal class Program
         foreach (int item in items_sets[limit]) Console.WriteLine($"{array[0, item]}, {array[1, item]}");
     }
 
-    static int FindMaxCostAndFormItemsSet(CustomArray array, int[] backpack, int current_weight, ref List<int>[] items_sets)
+    static int FindMaxCostAndFormItemsSet(ref CustomArray array, ref int[] backpack, int current_weight, ref List<int>[] items_sets)
     {
         //f - функция максимальной стоимости набора при данном весе
         int items_cost = -1;
@@ -359,6 +359,16 @@ internal class Program
     {
         int N = graph.Vertices;
         bool is_switched = false;
+
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            if (graph.weight_matrix[i, i].Count != 0)
+                graph.weight_matrix[i, i][0] = 0;
+            else
+                graph.weight_matrix[i, i].Add(0);
+        }
+        graph.PrintWeightMatrix();
+
         if (N > 1)
         {
             for (int k = 0; k < N; k++)
@@ -404,21 +414,13 @@ internal class Program
     #endregion
 
     #region Path in graph (Floyd)
-    static void MakeTheWay(CustomGraph graph) //ввести переменную для graph.Vertices
+    static void MakeTheWay(CustomGraph graph) 
     {
-        //первая и последняя связные вершины
         int start = 0;
         int end = graph.Vertices - 1;
 
-        List<int>[] prices = CountPricesForVertices(graph); //fix
+        List<int>[] prices = CountPricesForVertices(ref graph); 
         List<int> path = [];
-
-        ////убрать потом
-        //Console.WriteLine();
-        //Console.WriteLine("Price matrix: ");
-        //for (int j = 0; j < graph.Vertices; j++)
-        //    Console.Write($"{j}:{prices[j][0]}/{prices[j][1]}  ");
-        //Console.WriteLine();
 
         path.Add(end);
         for (int i = end; i > 0;)
@@ -438,12 +440,7 @@ internal class Program
                     {
                         if (path[k] == i && path[k + 1] == j)
                         {
-                            //Console.WriteLine($"i == {i}, j == {j}");
-                            //Console.WriteLine($"вставка вершины {graph.weight_matrix[i, j][1]} между {path[k]} и {path[k + 1]}");
                             path.Insert(k + 1, graph.weight_matrix[i, j][1]);
-                            //foreach (var item in path) Console.WriteLine($"{item} ");
-                            //Console.WriteLine();
-                            //Console.ReadKey();
                             break;
                         }                            
                     }
@@ -452,12 +449,6 @@ internal class Program
         }
 
         start = path[0];
-
-        //Console.WriteLine();
-        //Console.WriteLine("Path: ");
-        //foreach (int step in path)
-        //    Console.Write($"{step}  ");
-        //Console.WriteLine();
 
         Console.WriteLine($"\nКратчайший путь от вершины {start} до вершины {end}: ");
         for (int i = 0; i < path.Count - 1; i++)
@@ -469,7 +460,7 @@ internal class Program
         Console.WriteLine($"\nМаксимальная стоимость пути: {prices.Last()[0]}");
     }
 
-    static List<int>[] CountPricesForVertices(CustomGraph graph)
+    static List<int>[] CountPricesForVertices(ref CustomGraph graph)
     {
         List<int>[] prices = new List<int>[graph.Vertices]; //0 - вес, 1 - предыдущая вершина
         bool has_edge = false;
@@ -494,7 +485,6 @@ internal class Program
                 -1,
             ];
         }
-
         
         for (int j = 0; j < graph.Vertices; j++)
         { 
@@ -505,10 +495,8 @@ internal class Program
                     && graph.weight_matrix[i, j].Count != 0 
                     && graph.weight_matrix[i, j][0] + prices[i][0] < prices[j][0])
                 {
-                    //Console.Write($"вес[{i}, {j}] = {graph.weight_matrix[i, j][0]}, цена[{i}] = {prices[i][0]}, цена[{j}] = {prices[j][0]}, {graph.weight_matrix[i, j][0] + prices[i][0]} < {prices[j][0]} ");
                     prices[j][0] = graph.weight_matrix[i, j][0] + prices[i][0];
                     prices[j][1] = i;
-                    //Console.WriteLine($"цена: {prices[j][0]}, пред.верш.: {prices[j][1]}");
                     has_edge = true;
                 }
             }   
@@ -530,6 +518,9 @@ internal class Program
         int[] D = new int[graph.Vertices];
         List<int>[] paths = new List<int>[graph.Vertices];
         int chosen_vertex = v0;
+
+        graph.PrintWeightMatrix();
+        Console.WriteLine();
 
         for (int i = 0; i < graph.Vertices; i++)
         {
@@ -651,14 +642,7 @@ internal class Program
                                 graph.weight_matrix[v0, j][1] = chosen_vertex;
                         }                            
                     }
-                }                  
-               
-                //Console.WriteLine($"j = {j}");
-                //for (int i = 0; i < graph.weight_matrix[v0, j].Count; i++)
-                //{
-                //    Console.Write($"{graph.weight_matrix[v0, j][i]} ");
-                //}
-                //Console.WriteLine();
+                }    
             }
 
             V.Remove(chosen_vertex);
@@ -751,6 +735,150 @@ internal class Program
     }
     #endregion
 
+    #region Ford-Bellman
+    static void FordBellman(CustomGraph graph, int v0)
+    {
+        //-1 == INF
+        int[] D = new int[graph.Vertices];
+        int stabilized = 0;
+        int n_iter = 0;
+
+        for (int i = 0; i < D.Length; i++)
+        {
+            if (i == v0)
+                D[i] = 0;
+            else
+                D[i] = -1;
+        }
+
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            if (graph.weight_matrix[i, i].Count != 0)
+                graph.weight_matrix[i, i][0] = 0;
+            else
+                graph.weight_matrix[i, i].Add(0);
+        }            
+        graph.PrintWeightMatrix();
+
+        PrintD(ref D);
+
+        while (stabilized != graph.Vertices)
+        {            
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"Итерация {n_iter++}:".PadRight(13));
+            Console.ResetColor();
+            Console.WriteLine();
+           
+            RecountD(ref D, ref graph, ref stabilized, v0);
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"D({n_iter}) = ");
+            PrintD(ref D);
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+
+        graph.PrintWeightMatrix();
+
+        //пути
+        for (int i = 0; i < graph.Vertices; i++)
+        {
+            if (i != v0)
+            {
+                Console.WriteLine($"\nКратчайший путь от вершины {v0} до вершины {i}: ");
+                if (graph.weight_matrix[v0, i].Count == 2)
+                    Console.Write($"{v0} -> {graph.weight_matrix[v0, i][1]} -> {i}");
+                else
+                    Console.Write($"{v0} -> {i}");
+            }
+        }
+    }
+
+    static void RecountD(ref int[] D, ref CustomGraph graph, ref int stabilized, int v0)
+    {
+        int[] prev_D = new int[D.Length];
+        D.CopyTo(prev_D, 0);
+
+        for (int i = 0; i < D.Length; i++)
+        {
+            if (i != v0)
+            {
+                Console.Write($"D[{i}] = min(");
+                D[i] = FindMin(ref D, ref graph, i, v0);
+                Console.WriteLine($") = {D[i]}");
+            }
+            else
+                D[i] = 0;
+        }            
+
+        stabilized = 0;
+        for (int i = 0; i < D.Length; i++)
+            if (D[i] == prev_D[i])
+                stabilized++;
+    }
+
+    static int FindMin(ref int[] D, ref CustomGraph graph, int index, int v0)
+    {
+        int min = int.MaxValue;
+        int temp;
+
+        for (int i = 0; i < D.Length; i++)
+        {
+            if (graph.weight_matrix[i, index].Count != 0)
+            {
+                if ((temp = D[i] + graph.weight_matrix[i, index][0]) < min && D[i] != -1)
+                {
+                    min = temp;
+                    graph.weight_matrix[v0, index][0] = min;
+                    //путь 
+                    if (i != v0)
+                    {
+                        if (graph.weight_matrix[v0, index].Count < 2)
+                            graph.weight_matrix[v0, index].Add(i);
+                        else
+                            graph.weight_matrix[v0, index][1] = i;
+                    }                    
+                }                    
+
+                if (D[i] == -1)
+                    Console.Write($"INF + {graph.weight_matrix[i, index][0]}");
+                else
+                    Console.Write($"{D[i]} + {graph.weight_matrix[i, index][0]}");
+            }
+            else
+            {
+                if (D[i] == -1)
+                    Console.Write($"INF + INF");
+                else
+                    Console.Write($"{D[i]} + INF");
+            }
+
+            if (i != D.Length - 1)
+                Console.Write(", ");
+        }                   
+
+        return min;
+    }
+
+    static void PrintD(ref int[] D)
+    {
+        Console.Write('(');
+        foreach (int d in D)
+        {
+            if (d == -1)
+                Console.Write("INF".PadRight(4));
+            else
+            {
+                if (D.Last() == d)
+                    Console.Write($"{d}");
+                else
+                    Console.Write($"{d}".PadRight(4));
+            }
+        }
+        Console.WriteLine(')');
+    }
+    #endregion
+
     #region Prepare Data
     static CustomArray PrepareArray(bool is_positive = false, bool is_two_dimensional = false)
     {
@@ -802,7 +930,7 @@ internal class Program
     static CustomGraph PrepareGraph()
     {
         CustomGraph graph = new(range_graph_vertices, range_graph_weight);
-        graph.PrintGraph();
+        //graph.PrintGraph();
         Console.WriteLine();
         return graph;
     }
@@ -810,7 +938,7 @@ internal class Program
     static CustomGraph PrepareTestGraph(bool test1, bool test2, bool test3, bool test4)
     {
         CustomGraph graph = new(test1, test2, test3, test4);
-        graph.PrintGraph();
+        //graph.PrintGraph();
         Console.WriteLine();
         return graph;
     }
@@ -823,7 +951,7 @@ internal class Program
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n8.2) Дейкстра тест 2\n\nВыбор пункта: ");
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n8.2) Дейкстра тест 2\n9.1) Форд-Беллман тест 1\n9.2) Форд-Беллман тест 2\n\nВыбор пункта: ");
             string? choice = Console.ReadLine();
             Console.WriteLine();
 
@@ -889,6 +1017,16 @@ internal class Program
                 case "8.2":
                     Console.WriteLine("Дейкстра");
                     Dijkstra(PrepareTestGraph(false, false, false, true), 2);
+                    break;
+
+                case "9.1":
+                    Console.WriteLine("Форд-Беллман");
+                    FordBellman(PrepareTestGraph(false, false, true, false), 0);
+                    break;
+
+                case "9.2":
+                    Console.WriteLine("Форд-Беллман");
+                    FordBellman(PrepareTestGraph(false, false, false, true), 2);
                     break;
 
                 case "0": return;
