@@ -240,6 +240,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 AddEdge(2, 2, 0);
                 AddEdge(2, 3, 8);
                 AddEdge(2, 4, 7, true);
+                AddEdge(3, 0, 4);
                 AddEdge(3, 3, 0);
                 AddEdge(3, 4, 5, true);
                 AddEdge(3, 5, 7);
@@ -250,6 +251,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 AddEdge(4, 5, 3, true);
                 AddEdge(5, 0, 2, true);
                 AddEdge(5, 1, 4, true);
+                AddEdge(5, 3, 7);
                 AddEdge(5, 4, 8, true);
                 AddEdge(5, 5, 0);
 

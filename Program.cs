@@ -656,7 +656,7 @@ internal partial class Program
             paths[i] = [];
             if (i != v0)
             {
-                paths[i] = PathToAnotherVertices(graph, i, v0);
+                paths[i] = PathToAnotherVertices(ref graph, i, v0);
                 Console.WriteLine($"\nКратчайший путь от вершины {v0} до вершины {i}: ");
                 for (int k = 0; k < paths[i].Count - 1; k++)
                     Console.Write($"{paths[i][k]} → ");
@@ -702,36 +702,34 @@ internal partial class Program
         return min_index;
     }
 
-    static List<int> PathToAnotherVertices(CustomGraph graph, int i, int v0)
+    static List<int> PathToAnotherVertices(ref CustomGraph graph, int i, int v0)
     {
         List<int> path = [];
-        List<int> local_path = [];
-            
-        if (i == v0)
-            path.Add(v0);
-        else
-        {
-            path.Add(v0);
-            //if (graph.weight_matrix[v0, i].Count == 2 && graph.weight_matrix[v0, i][1] != i)
-            //{
-            //    int t = graph.weight_matrix[v0, i][1];                
-            //    if (graph.weight_matrix[v0, t].Count == 2 && graph.weight_matrix[v0, t][1] != i)
-            //    {
-            //        int p = graph.weight_matrix[v0, t][1];
-            //        if (graph.weight_matrix[v0, p].Count == 2 && graph.weight_matrix[v0, p][1] != i)
-            //        {
-            //            path.Add(graph.weight_matrix[v0, p][1]);
-            //        }
-            //        path.Add(graph.weight_matrix[v0, t][1]);
-            //    }
-            //    path.Add(graph.weight_matrix[v0, i][1]);
-            //}
-            if (graph.weight_matrix[v0, i].Count == 2 && graph.weight_matrix[v0, i][1] != i)
-                path.Add(graph.weight_matrix[v0, i][1]);
+        int current_child = i;
+
+        path.Add(v0);
+        if (i != v0)
             path.Add(i);
+
+        while (HasParent(ref graph, ref current_child, i, v0))
+        {
+            path.Insert(1, current_child);
+            i = current_child;
         }
 
         return path;
+    }
+
+    static bool HasParent(ref CustomGraph graph, ref int current_child, int child, int v0)
+    {
+        switch (graph.weight_matrix[v0, child].Count)
+        {
+            case 2:
+                current_child = graph.weight_matrix[v0, child][1];
+                return true;
+            default:
+                return false;
+        }
     }
     #endregion
 
@@ -740,6 +738,7 @@ internal partial class Program
     {
         //-1 == INF
         int[] D = new int[graph.Vertices];
+        List<int>[] paths = new List<int>[graph.Vertices];
         int stabilized = 0;
         int n_iter = 0;
 
@@ -776,6 +775,7 @@ internal partial class Program
             PrintD(ref D);
             Console.ResetColor();
             Console.WriteLine();
+            graph.PrintWeightMatrix();
         }
 
         graph.PrintWeightMatrix();
@@ -783,14 +783,17 @@ internal partial class Program
         //пути
         for (int i = 0; i < graph.Vertices; i++)
         {
+            paths[i] = [];
             if (i != v0)
             {
+                paths[i] = PathToAnotherVertices(ref graph, i, v0);
                 Console.WriteLine($"\nКратчайший путь от вершины {v0} до вершины {i}: ");
-                if (graph.weight_matrix[v0, i].Count == 2)
-                    Console.Write($"{v0} -> {graph.weight_matrix[v0, i][1]} -> {i}");
-                else
-                    Console.Write($"{v0} -> {i}");
+                for (int k = 0; k < paths[i].Count - 1; k++)
+                    Console.Write($"{paths[i][k]} → ");
+                Console.WriteLine($"{paths[i].Last()}");
             }
+            else
+                paths[i].Add(v0);
         }
     }
 
@@ -804,12 +807,15 @@ internal partial class Program
             if (i != v0)
             {
                 Console.Write($"D[{i}] = min(");
-                D[i] = FindMin(ref D, ref graph, i, v0);
-                Console.WriteLine($") = {D[i]}");
+                D[i] = FindMin(ref prev_D, ref graph, i, v0);
+                if (D[i] == -1)
+                    Console.WriteLine($") = INF");
+                else
+                    Console.WriteLine($") = {D[i]}");
             }
             else
                 D[i] = 0;
-        }            
+        }
 
         stabilized = 0;
         for (int i = 0; i < D.Length; i++)
@@ -819,7 +825,8 @@ internal partial class Program
 
     static int FindMin(ref int[] D, ref CustomGraph graph, int index, int v0)
     {
-        int min = int.MaxValue;
+        nint min = int.MaxValue;
+        //int 
         int temp;
 
         for (int i = 0; i < D.Length; i++)
@@ -829,16 +836,32 @@ internal partial class Program
                 if ((temp = D[i] + graph.weight_matrix[i, index][0]) < min && D[i] != -1)
                 {
                     min = temp;
-                    graph.weight_matrix[v0, index][0] = min;
+                    //if (graph.weight_matrix[v0, index].Count != 0)
+                    //    graph.weight_matrix[v0, index][0] = (int)min;
+                    //else
+                    //    graph.weight_matrix[v0, index].Add((int)min);
+
                     //путь 
-                    if (i != v0)
+                    if (i != v0 && i != index)
                     {
-                        if (graph.weight_matrix[v0, index].Count < 2)
+                        if (graph.weight_matrix[v0, index].Count == 1)
+                        {
+                            graph.weight_matrix[v0, index][0] = (int)min;
                             graph.weight_matrix[v0, index].Add(i);
-                        else
+                        }                            
+                        else if (graph.weight_matrix[v0, index].Count == 2)
+                        {
+                            graph.weight_matrix[v0, index][0] = (int)min;
                             graph.weight_matrix[v0, index][1] = i;
-                    }                    
-                }                    
+                        }                            
+                        else
+                        {
+                            graph.weight_matrix[v0, index].Add((int)min);
+                            graph.weight_matrix[v0, index].Add(i);
+                        }
+
+                    }
+                }
 
                 if (D[i] == -1)
                     Console.Write($"INF + {graph.weight_matrix[i, index][0]}");
@@ -855,9 +878,9 @@ internal partial class Program
 
             if (i != D.Length - 1)
                 Console.Write(", ");
-        }                   
+        }
 
-        return min;
+        return min == int.MaxValue ? -1 : (int)min;
     }
 
     static void PrintD(ref int[] D)
