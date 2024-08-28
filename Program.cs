@@ -826,7 +826,6 @@ internal partial class Program
     static int FindMin(ref int[] D, ref CustomGraph graph, int index, int v0)
     {
         nint min = int.MaxValue;
-        //int 
         int temp;
 
         for (int i = 0; i < D.Length; i++)
@@ -836,30 +835,31 @@ internal partial class Program
                 if ((temp = D[i] + graph.weight_matrix[i, index][0]) < min && D[i] != -1)
                 {
                     min = temp;
-                    //if (graph.weight_matrix[v0, index].Count != 0)
-                    //    graph.weight_matrix[v0, index][0] = (int)min;
-                    //else
-                    //    graph.weight_matrix[v0, index].Add((int)min);
 
                     //путь 
                     if (i != v0 && i != index)
                     {
                         if (graph.weight_matrix[v0, index].Count == 1)
                         {
-                            graph.weight_matrix[v0, index][0] = (int)min;
-                            graph.weight_matrix[v0, index].Add(i);
+                            if (graph.weight_matrix[v0, index][0] > min)
+                            {
+                                graph.weight_matrix[v0, index][0] = (int)min;
+                                graph.weight_matrix[v0, index].Add(i);
+                            }
                         }                            
                         else if (graph.weight_matrix[v0, index].Count == 2)
                         {
-                            graph.weight_matrix[v0, index][0] = (int)min;
-                            graph.weight_matrix[v0, index][1] = i;
+                            if (graph.weight_matrix[v0, index][0] > min)
+                            {
+                                graph.weight_matrix[v0, index][0] = (int)min;
+                                graph.weight_matrix[v0, index][1] = i;
+                            }                               
                         }                            
                         else
                         {
                             graph.weight_matrix[v0, index].Add((int)min);
                             graph.weight_matrix[v0, index].Add(i);
                         }
-
                     }
                 }
 
