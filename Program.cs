@@ -743,12 +743,7 @@ internal partial class Program
         int n_iter = 0;
 
         for (int i = 0; i < D.Length; i++)
-        {
-            if (i == v0)
-                D[i] = 0;
-            else
-                D[i] = -1;
-        }
+            D[i] = (i == v0) ? 0 : -1;
 
         for (int i = 0; i < graph.Vertices; i++)
         {
@@ -775,7 +770,6 @@ internal partial class Program
             PrintD(ref D);
             Console.ResetColor();
             Console.WriteLine();
-            graph.PrintWeightMatrix();
         }
 
         graph.PrintWeightMatrix();
@@ -808,10 +802,7 @@ internal partial class Program
             {
                 Console.Write($"D[{i}] = min(");
                 D[i] = FindMin(ref prev_D, ref graph, i, v0);
-                if (D[i] == -1)
-                    Console.WriteLine($") = INF");
-                else
-                    Console.WriteLine($") = {D[i]}");
+                Console.WriteLine((D[i] == -1) ? ") = INF" : $") = {D[i]}");
             }
             else
                 D[i] = 0;
@@ -830,7 +821,7 @@ internal partial class Program
 
         for (int i = 0; i < D.Length; i++)
         {
-            if (graph.weight_matrix[i, index].Count != 0)
+            if (graph.adjacency[i, index] != null)
             {
                 if ((temp = D[i] + graph.weight_matrix[i, index][0]) < min && D[i] != -1)
                 {
@@ -839,42 +830,55 @@ internal partial class Program
                     //путь 
                     if (i != v0 && i != index)
                     {
-                        if (graph.weight_matrix[v0, index].Count == 1)
+                        switch (graph.weight_matrix[v0, index].Count)
                         {
-                            if (graph.weight_matrix[v0, index][0] > min)
-                            {
-                                graph.weight_matrix[v0, index][0] = (int)min;
+                            case 0:
+                                graph.weight_matrix[v0, index].Add((int)min);
                                 graph.weight_matrix[v0, index].Add(i);
-                            }
-                        }                            
-                        else if (graph.weight_matrix[v0, index].Count == 2)
-                        {
-                            if (graph.weight_matrix[v0, index][0] > min)
-                            {
-                                graph.weight_matrix[v0, index][0] = (int)min;
-                                graph.weight_matrix[v0, index][1] = i;
-                            }                               
-                        }                            
-                        else
-                        {
-                            graph.weight_matrix[v0, index].Add((int)min);
-                            graph.weight_matrix[v0, index].Add(i);
+                                if (!graph.Oriented)
+                                {
+                                    graph.weight_matrix[index, v0].Add((int)min);
+                                    graph.weight_matrix[index, v0].Add(i);
+                                }
+                                break;
+
+                            case 1:
+                                if (graph.weight_matrix[v0, index][0] > min)
+                                {
+                                    graph.weight_matrix[v0, index][0] = (int)min;
+                                    graph.weight_matrix[v0, index].Add(i);
+                                    if (!graph.Oriented)
+                                    {
+                                        graph.weight_matrix[index, v0][0] = (int)min;
+                                        graph.weight_matrix[index, v0].Add(i);
+                                    }
+                                }
+                                break;
+
+                            case 2:
+                                if (graph.weight_matrix[v0, index][0] > min)
+                                {
+                                    graph.weight_matrix[v0, index][0] = (int)min;
+                                    graph.weight_matrix[v0, index][1] = i;
+                                    if (!graph.Oriented)
+                                    {
+                                        graph.weight_matrix[index, v0][0] = (int)min;
+                                        graph.weight_matrix[index, v0][1] = i;
+                                    }
+                                }
+                                break;
+
+                            default:
+                                throw new Exception("Лишние значения в weight_matrix");
                         }
                     }
                 }
 
-                if (D[i] == -1)
-                    Console.Write($"INF + {graph.weight_matrix[i, index][0]}");
-                else
-                    Console.Write($"{D[i]} + {graph.weight_matrix[i, index][0]}");
+                Console.Write((D[i] == -1) ? "INF" : $"{D[i]}");
+                Console.Write($" + {graph.weight_matrix[i, index][0]}");
             }
             else
-            {
-                if (D[i] == -1)
-                    Console.Write($"INF + INF");
-                else
-                    Console.Write($"{D[i]} + INF");
-            }
+                Console.Write((D[i] == -1) ? "INF + INF" : $"{D[i]} + INF");
 
             if (i != D.Length - 1)
                 Console.Write(", ");
@@ -888,14 +892,15 @@ internal partial class Program
         Console.Write('(');
         foreach (int d in D)
         {
-            if (d == -1)
-                Console.Write("INF".PadRight(4));
-            else
+            switch (d)
             {
-                if (D.Last() == d)
-                    Console.Write($"{d}");
-                else
-                    Console.Write($"{d}".PadRight(4));
+                case -1:
+                    Console.Write("INF".PadRight(4));
+                    break;
+
+                default:
+                    Console.Write((D.Last() == d) ? $"{d}" : $"{d}".PadRight(4));
+                    break;
             }
         }
         Console.WriteLine(')');

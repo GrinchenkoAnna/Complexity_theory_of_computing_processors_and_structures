@@ -12,7 +12,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
         private int vertices;
         private int edges;
         private bool oriented;
-        private int?[,] adjacency;
+        public int?[,] adjacency;
         public List<int>[,] weight_matrix; //0 - weight; 1 - промежуточная вершина, если есть
 
         readonly Random random_graph = new();
@@ -316,7 +316,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 Vertices--;
             }
             else
-                throw new ArgumentException($"Такой вершины нет. Количество вершин: {Vertices}");
+                throw new Exception($"Такой вершины нет. Количество вершин: {Vertices}");
         }
 
         public void PrintGraph(int output_width = 12, List<int> path = null)
@@ -448,7 +448,7 @@ namespace Complexity_theory_of_computing_processors_and_structures
                             break;
 
                         default:
-                            throw new Exception("path overflow");
+                            throw new Exception("Лишние значения в weight_matrix");
                     }                    
                 }
                 Console.WriteLine();
