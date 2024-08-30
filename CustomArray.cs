@@ -51,22 +51,39 @@ namespace Complexity_theory_of_computing_processors_and_structures
                 custom_array1[i] = random_arr.Next(min, max);
         }
 
-        public CustomArray(int size1, int size2, bool test = false)
+        public CustomArray(int size1, int size2, bool test = false, int num = 0)
         {
             dimension = 2;
             Rows = size1;
             Columns = size2;
             custom_array2 = new int[Rows, Columns];
 
-            if (test) //рюкзак
+            if (test)
             {
-                custom_array2[0, 0] = 5;
-                custom_array2[0, 1] = 7;
-                custom_array2[0, 2] = 11;
-                custom_array2[1, 0] = 9;
-                custom_array2[1, 1] = 13;
-                custom_array2[1, 2] = 21;
-            }
+                switch (num)
+                {
+                    case 6:
+                        custom_array2[0, 0] = 5;
+                        custom_array2[0, 1] = 7;
+                        custom_array2[0, 2] = 11;
+                        custom_array2[1, 0] = 9;
+                        custom_array2[1, 1] = 13;
+                        custom_array2[1, 2] = 21;
+                        break;
+
+                    case 7:
+                        custom_array2[0, 0] = 3;
+                        custom_array2[0, 1] = 5;
+                        custom_array2[0, 2] = 7;
+                        custom_array2[1, 0] = 8;
+                        custom_array2[1, 1] = 14;
+                        custom_array2[1, 2] = 20;
+                        break;
+
+                    default:
+                        break;
+                }
+            }            
         }
 
         public CustomArray(int size1, int size2, int min, int max) : this(size1, size2)

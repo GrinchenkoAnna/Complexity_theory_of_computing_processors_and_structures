@@ -282,9 +282,17 @@ internal partial class Program
 
         for (int i = 1; i <= limit; i++)
         {
+            Console.Write($"f({i})".PadRight(5));            
+            Console.Write($" = max("); 
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+
             int result = FindMaxCostAndFormItemsSet(ref array, ref backpack, i, ref items_sets);
             //если вещь подходит, учитываем ее стоимость, если нет - стоимость не меняется
             _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
+
+            Console.ResetColor();
+            Console.Write(")");            
+            Console.WriteLine($" = {backpack[i]}");
         }
 
         Console.WriteLine($"Максимальная стоимость набора: {backpack[limit]}");
@@ -306,15 +314,25 @@ internal partial class Program
         for (int i = 0; i < array.Columns; i++)
         {
             f_index = current_weight - array[0, i];
+            Console.Write($"f({current_weight} - {array[0, i]}) + {array[1, i]}");
+
             if (f_index >= 0)
             {
+                Console.Write(" = ");
+                Console.ResetColor();
+                Console.Write($"{backpack[f_index] + array[1, i]}");
+
                 if (items_cost < backpack[f_index] + array[1, i]) /*1. кладем первую вещь*/
-                {                                                 /*2. если для другой вещи условия лучше, меняем на другую*/      
+                {                                                 /*2. если для другой вещи условия лучше, меняем на другую*/ 
                     items_cost = backpack[f_index] + array[1, i];
                     last_used_data.first = i;
                     last_used_data.second = f_index;
                 }
             }
+
+            if (i < array.Columns - 1)
+                Console.Write(", ");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
         }
 
         if (last_used_data.first >= 0)
@@ -912,11 +930,13 @@ internal partial class Program
         switch (choice)
         {
             case 6:
-                array = new(2, 3, true);
+                array = new(2, 3, true, 6);
                 array.PrintArray();
                 break;
 
             case 7:
+                array = new(2, 3, true, 7);
+                array.PrintArray();
                 break;
 
             default:
@@ -951,7 +971,7 @@ internal partial class Program
         while (true)
         {
             Console.Clear();
-            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n8.2) Дейкстра тест 2\n9.1) Форд-Беллман тест 1\n9.2) Форд-Беллман тест 2\n\nВыбор пункта: ");
+            Console.Write("1) SelectSort\n2) BubbleSort\n3) MergeSort\n4) Лестница\n5) Шахматная доска\n6) Рюкзак\n0) Выход\n\n6.1) Рюкзак тест 1\n6.2) Рюкзак тест 2\n6.3) Рюкзак тест 3\n7.1) Флойд тест 1\n7.2) Флойд тест 2\n8.1) Дейкстра тест 1\n8.2) Дейкстра тест 2\n9.1) Форд-Беллман тест 1\n9.2) Форд-Беллман тест 2\n\nВыбор пункта: ");
             string? choice = Console.ReadLine();
             Console.WriteLine();
 
@@ -997,6 +1017,11 @@ internal partial class Program
                 case "6.2":
                     Console.WriteLine("Рюкзак");
                     Backpack(PrepareTestArray(6), 24);
+                    break;
+
+                case "6.3":
+                    Console.WriteLine("Рюкзак");
+                    Backpack(PrepareTestArray(7), 20);
                     break;
 
                 case "7.1":
