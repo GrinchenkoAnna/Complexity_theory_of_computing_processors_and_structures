@@ -19,8 +19,6 @@ internal partial class Program
     #region Select
     static void SelectSort(CustomArray array)
     {
-        int comparision = 0, permutation = 0;
-
         for (int i = 0; i < array.Columns; i++)
         {
             int min = i;
@@ -28,26 +26,19 @@ internal partial class Program
             {
                 if (array[j] < array[min])
                     min = j;
-                comparision++;
             }
 
             (array[min], array[i]) = (array[i], array[min]);
-            permutation++;
         }
 
         Console.WriteLine("\u2193");
         array.PrintArray();
-
-        Console.WriteLine($"Теоретическая трудоемкость алгоритма: 1/2*N^2 = {Math.Ceiling((double)Math.Pow(array.Columns, 2) / 2)}");
-        Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
     }
     #endregion
 
     #region Bubble
     static void BubbleSort(CustomArray array)
     {
-        int comparision = 0, permutation = 0;
-
         for (int i = 0; i < array.Columns; i++)
         {
             for (int j = 0; j < array.Columns - 1 - i; j++)
@@ -55,26 +46,20 @@ internal partial class Program
                 if (array[j] > array[j + 1])
                 {
                     (array[j], array[j + 1]) = (array[j + 1], array[j]);
-                    permutation++;
                 }
-                comparision++;
             }
         }
 
         Console.WriteLine("\u2193");
         array.PrintArray();
-
-        Console.WriteLine($"Теоретическая трудоемкость алгоритма: N^2 = {Math.Pow(array.Columns, 2)}");
-        Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
     }
     #endregion
 
     #region Merge
     static void MergeSort(CustomArray array)
     {
-        int comparision = 0, permutation = 0;
         int delete = CheckN(ref array);
-        Sort(array, 0, array.Columns - 1, ref comparision, ref permutation);
+        Sort(ref array, 0, array.Columns - 1);
 
         Console.WriteLine("\u2193");
         array.PrintArray();
@@ -84,26 +69,19 @@ internal partial class Program
             array = CustomArray.ResizeArray(array, array.Columns - delete);
             array.PrintArray();
         }
-
-        Console.WriteLine($"Теоретическая трудоемкость алгоритма: N*logN = {array.Columns * Math.Ceiling(Math.Log2(array.Columns))}");
-        Console.WriteLine($"Реальная трудоемкость алгоритма: {comparision + permutation}");
     }
-    static void Sort(CustomArray array, int left, int right, ref int comparision, ref int permutation)
+    static void Sort(ref CustomArray array, int left, int right)
     {
 
         if (left < right)
         {
-            comparision++;
-
             int middle = left + (right - left) / 2;
-            Sort(array, left, middle, ref comparision, ref permutation);
-            Sort(array, middle + 1, right, ref comparision, ref permutation);
-            Merge(array, left, middle, right, comparision, permutation);
-
-            permutation++;
+            Sort(ref array, left, middle);
+            Sort(ref array, middle + 1, right);
+            Merge(ref array, left, middle, right);
         }
     }
-    static void Merge(CustomArray array, int left, int middle, int right, int comparision, int permutation)
+    static void Merge(ref CustomArray array, int left, int middle, int right)
     {
         int size1 = middle - left + 1;
         int size2 = right - middle;
@@ -125,17 +103,14 @@ internal partial class Program
             {
                 array[k] = tempLeft[i];
                 i++;
-                permutation++;
             }
             else
             {
                 array[k] = tempRight[j];
                 j++;
-                permutation++;
             }
 
             k++;
-            comparision++;
         }
 
         while (i < size1)
@@ -143,7 +118,6 @@ internal partial class Program
             array[k] = tempLeft[i];
             i++;
             k++;
-            permutation++;
         }
 
         while (j < size2)
@@ -151,7 +125,6 @@ internal partial class Program
             array[k] = tempRight[j];
             j++;
             k++;
-            permutation++;
         }
     }
     static int CheckN(ref CustomArray array)
@@ -167,7 +140,7 @@ internal partial class Program
             {
                 int to_add = (int)Math.Pow(2, i) - array.Columns;
                 int prev_length = array.Columns;
-                int Max = FindMax(array);
+                int Max = FindMax(ref array);
 
                 Console.WriteLine($"Число элементов в массиве = {prev_length} != 2^k, необходимо добавить {to_add}");          
                 array = CustomArray.ResizeArray(array, prev_length + to_add);
@@ -180,7 +153,7 @@ internal partial class Program
             }
         }
     }
-    static int FindMax(CustomArray array)
+    static int FindMax(ref CustomArray array)
     {
         int max = array[0];
         for (int i = 0; i < array.Columns; i++)
@@ -235,6 +208,7 @@ internal partial class Program
         int[,] summa = new int[M, N];
         Union[] path = new Union[M + N - 1];
 
+        //сумма
         for (int i = 0; i < M; i++)
         {
             for (int j = 0; j < N; j++)
@@ -250,6 +224,7 @@ internal partial class Program
             }
         }
 
+        //путь
         path[0].first = M - 1;
         path[0].second = N - 1;
         int path_index = 1, x = M - 1, y = N - 1;
@@ -299,8 +274,8 @@ internal partial class Program
     #region Backpack
     static void Backpack(CustomArray array, int limit)
     {        
-        int[] backpack = new int[limit + 1];
-        List<int>[] items_sets = new List<int>[limit + 1];
+        int[] backpack = new int[limit + 1]; //стоимость для каждогов веса
+        List<int>[] items_sets = new List<int>[limit + 1]; //содержимое рюкзака
 
         backpack[0] = 0;
         items_sets[0] = [];
@@ -308,6 +283,7 @@ internal partial class Program
         for (int i = 1; i <= limit; i++)
         {
             int result = FindMaxCostAndFormItemsSet(ref array, ref backpack, i, ref items_sets);
+            //если вещь подходит, учитываем ее стоимость, если нет - стоимость не меняется
             _ = result > 0 ? backpack[i] = result : backpack[i] = backpack[i - 1];
         }
 
@@ -325,15 +301,15 @@ internal partial class Program
             first = -1, //последний добавленный в рюкзак элемент
             second = -1 //индекс f, при котором был добавлен этот элемент
         };
-        int f_index;
+        int f_index; //индекс, для которого будет считаться f
 
         for (int i = 0; i < array.Columns; i++)
         {
             f_index = current_weight - array[0, i];
             if (f_index >= 0)
             {
-                if (items_cost < backpack[f_index] + array[1, i])
-                {
+                if (items_cost < backpack[f_index] + array[1, i]) /*1. кладем первую вещь*/
+                {                                                 /*2. если для другой вещи условия лучше, меняем на другую*/      
                     items_cost = backpack[f_index] + array[1, i];
                     last_used_data.first = i;
                     last_used_data.second = f_index;
@@ -409,12 +385,13 @@ internal partial class Program
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршелла:");
         graph.PrintWeightMatrix(9);
 
-        MakeTheWay(graph);
+        MakeTheWay(ref graph);
     }
     #endregion
 
     #region Path in graph (Floyd)
-    static void MakeTheWay(CustomGraph graph) 
+    //возможно, не нужно
+    static void MakeTheWay(ref CustomGraph graph) 
     {
         int start = 0;
         int end = graph.Vertices - 1;
@@ -611,11 +588,13 @@ internal partial class Program
                     if (D[j] > graph.weight_matrix[v0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0])
                     {
                         D[j] = graph.weight_matrix[v0, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, j][0];
+                        //вес
                         if (graph.weight_matrix[v0, j].Count != 0)
                             graph.weight_matrix[v0, j][0] = D[j];
                         else
                             graph.weight_matrix[v0, j].Add(D[j]);
 
+                        //путь
                         if (graph.weight_matrix[v0, j].Count == 1)
                             graph.weight_matrix[v0, j].Add(chosen_vertex);
                         else if (graph.weight_matrix[v0, j].Count == 2)
@@ -650,22 +629,9 @@ internal partial class Program
         }
         Console.WriteLine();
 
-        //пути
-        for (int i = 0; i < graph.Vertices; i++)
-        {
-            paths[i] = [];
-            if (i != v0)
-            {
-                paths[i] = PathToAnotherVertices(ref graph, i, v0);
-                Console.WriteLine($"\nКратчайший путь от вершины {v0} до вершины {i}: ");
-                for (int k = 0; k < paths[i].Count - 1; k++)
-                    Console.Write($"{paths[i][k]} → ");
-                Console.WriteLine($"{paths[i].Last()}");
-            }                
-            else
-                paths[i].Add(v0);           
-        }
-    }
+        //пути        
+        FindShortestPath(ref graph, v0, ref paths);
+    }    
 
     static int FindMin(int[] D, List<int> S, List<int> V, int v0)
     {
@@ -676,6 +642,7 @@ internal partial class Program
         int min = 0;        
         int min_index = 0;
         
+        //для установки начальных значений
         for (int i = 0; i < D.Length; i++)
         {
             if (i == v0)
@@ -688,6 +655,7 @@ internal partial class Program
             }
         } 
 
+        //поиск min
         for (int i = 0; i < D.Length; i++)
         {
             if (i == v0)
@@ -775,6 +743,10 @@ internal partial class Program
         graph.PrintWeightMatrix();
 
         //пути
+        FindShortestPath(ref graph, v0, ref paths);
+    }
+    static void FindShortestPath(ref CustomGraph graph, int v0, ref List<int>[] paths)
+    {
         for (int i = 0; i < graph.Vertices; i++)
         {
             paths[i] = [];
@@ -963,9 +935,9 @@ internal partial class Program
         return graph;
     }
 
-    static CustomGraph PrepareTestGraph(bool test1, bool test2, bool test3, bool test4)
+    static CustomGraph PrepareTestGraph(int test)
     {
-        CustomGraph graph = new(test1, test2, test3, test4);
+        CustomGraph graph = new(test);
         //graph.PrintGraph();
         Console.WriteLine();
         return graph;
@@ -1029,32 +1001,32 @@ internal partial class Program
 
                 case "7.1":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph(true, false, false, false));
+                    Floyd(PrepareTestGraph(1));
                     break;
 
                 case "7.2":
                     Console.WriteLine("Флойд");
-                    Floyd(PrepareTestGraph(false, true, false, false));
+                    Floyd(PrepareTestGraph(2));
                     break;
 
                 case "8.1":
                     Console.WriteLine("Дейкстра");
-                    Dijkstra(PrepareTestGraph(false, false, true, false), 0);
+                    Dijkstra(PrepareTestGraph(3), 0);
                     break;
 
                 case "8.2":
                     Console.WriteLine("Дейкстра");
-                    Dijkstra(PrepareTestGraph(false, false, false, true), 2);
+                    Dijkstra(PrepareTestGraph(4), 2);
                     break;
 
                 case "9.1":
                     Console.WriteLine("Форд-Беллман");
-                    FordBellman(PrepareTestGraph(false, false, true, false), 0);
+                    FordBellman(PrepareTestGraph(3), 0);
                     break;
 
                 case "9.2":
                     Console.WriteLine("Форд-Беллман");
-                    FordBellman(PrepareTestGraph(false, false, false, true), 2);
+                    FordBellman(PrepareTestGraph(4), 2);
                     break;
 
                 case "0": return;

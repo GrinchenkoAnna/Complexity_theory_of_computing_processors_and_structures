@@ -106,159 +106,164 @@ namespace Complexity_theory_of_computing_processors_and_structures
         #endregion
 
         //тесты
-        public CustomGraph(bool test1, bool test2, bool test3, bool test4)
+        public CustomGraph(int test)
         {
-            if (test1 == true)
+            switch (test)
             {
-                Vertices = 17;
-                Edges = 27;
-                Oriented = false;
-                adjacency = new int?[Vertices, Vertices];
-                weight_matrix = new List<int>[Vertices, Vertices];
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        weight_matrix[i, j] = [];
+                case 1:
+                    Vertices = 17;
+                    Edges = 27;
+                    Oriented = false;
+                    adjacency = new int?[Vertices, Vertices];
+                    weight_matrix = new List<int>[Vertices, Vertices];
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            weight_matrix[i, j] = [];
 
-                AddEdge(0, 1, 4);
-                AddEdge(0, 2, 5);
-                AddEdge(0, 3, 6);
-                AddEdge(1, 4, 6);
-                AddEdge(1, 5, 8);
-                AddEdge(1, 6, 7);
-                AddEdge(2, 6, 8);
-                AddEdge(2, 7, 9);
-                AddEdge(3, 6, 6);
-                AddEdge(3, 7, 7);
-                AddEdge(4, 8, 4);
-                AddEdge(5, 8, 5);
-                AddEdge(5, 9, 5);
-                AddEdge(6, 9, 6);
-                AddEdge(6, 10, 5);
-                AddEdge(6, 11, 6);
-                AddEdge(7, 10, 4);
-                AddEdge(7, 11, 5);
-                AddEdge(8, 12, 7);
-                AddEdge(9, 12, 6);
-                AddEdge(9, 13, 8);
-                AddEdge(10, 13, 7);
-                AddEdge(10, 14, 6);
-                AddEdge(10, 16, 15); //+
-                AddEdge(11, 14, 7);
-                AddEdge(12, 15, 9);
-                AddEdge(13, 15, 8);
-                AddEdge(14, 16, 7);
+                    AddEdge(0, 1, 4);
+                    AddEdge(0, 2, 5);
+                    AddEdge(0, 3, 6);
+                    AddEdge(1, 4, 6);
+                    AddEdge(1, 5, 8);
+                    AddEdge(1, 6, 7);
+                    AddEdge(2, 6, 8);
+                    AddEdge(2, 7, 9);
+                    AddEdge(3, 6, 6);
+                    AddEdge(3, 7, 7);
+                    AddEdge(4, 8, 4);
+                    AddEdge(5, 8, 5);
+                    AddEdge(5, 9, 5);
+                    AddEdge(6, 9, 6);
+                    AddEdge(6, 10, 5);
+                    AddEdge(6, 11, 6);
+                    AddEdge(7, 10, 4);
+                    AddEdge(7, 11, 5);
+                    AddEdge(8, 12, 7);
+                    AddEdge(9, 12, 6);
+                    AddEdge(9, 13, 8);
+                    AddEdge(10, 13, 7);
+                    AddEdge(10, 14, 6);
+                    AddEdge(10, 16, 15); //+
+                    AddEdge(11, 14, 7);
+                    AddEdge(12, 15, 9);
+                    AddEdge(13, 15, 8);
+                    AddEdge(14, 16, 7);
 
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        if (adjacency[i, j] != null)
-                            weight_matrix[i, j].Add((int)adjacency[i, j]);
-            }
-            else if (test2 == true)
-            {
-                Vertices = 10;
-                Edges = 17;
-                Oriented = false;
-                adjacency = new int?[Vertices, Vertices];
-                weight_matrix = new List<int>[Vertices, Vertices];
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        weight_matrix[i, j] = [];
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            if (adjacency[i, j] != null)
+                                weight_matrix[i, j].Add((int)adjacency[i, j]);
+                    break;
 
-                AddEdge(0, 1, 2);
-                AddEdge(0, 2, 3);
-                AddEdge(0, 3, 1);
-                AddEdge(1, 4, 1);
-                AddEdge(1, 5, 3);
-                AddEdge(2, 4, 2);
-                AddEdge(2, 5, 2);
-                AddEdge(2, 6, 2);
-                AddEdge(3, 5, 3);
-                AddEdge(3, 5, 4);
-                AddEdge(3, 5, 4);
-                AddEdge(4, 8, 5);
-                AddEdge(5, 7, 1);
-                AddEdge(5, 8, 1);
-                AddEdge(5, 9, 3);
-                AddEdge(6, 9, 2);
-                AddEdge(7, 9, 1);
-                AddEdge(8, 9, 1);
+                case 2:
+                    Vertices = 10;
+                    Edges = 17;
+                    Oriented = false;
+                    adjacency = new int?[Vertices, Vertices];
+                    weight_matrix = new List<int>[Vertices, Vertices];
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            weight_matrix[i, j] = [];
 
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        if (adjacency[i, j] != null)
-                            weight_matrix[i, j].Add((int)adjacency[i, j]);
-            }
-            else if (test3 == true)
-            {
-                Vertices = 5;
-                Edges = 7;
-                Oriented = false;
-                adjacency = new int?[Vertices, Vertices];
-                weight_matrix = new List<int>[Vertices, Vertices];
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        weight_matrix[i, j] = [];
+                    AddEdge(0, 1, 2);
+                    AddEdge(0, 2, 3);
+                    AddEdge(0, 3, 1);
+                    AddEdge(1, 4, 1);
+                    AddEdge(1, 5, 3);
+                    AddEdge(2, 4, 2);
+                    AddEdge(2, 5, 2);
+                    AddEdge(2, 6, 2);
+                    AddEdge(3, 5, 3);
+                    AddEdge(3, 5, 4);
+                    AddEdge(3, 5, 4);
+                    AddEdge(4, 8, 5);
+                    AddEdge(5, 7, 1);
+                    AddEdge(5, 8, 1);
+                    AddEdge(5, 9, 3);
+                    AddEdge(6, 9, 2);
+                    AddEdge(7, 9, 1);
+                    AddEdge(8, 9, 1);
 
-                AddEdge(0, 1, 25);
-                AddEdge(0, 2, 15);
-                AddEdge(0, 3, 7);
-                AddEdge(0, 4, 2);
-                AddEdge(1, 2, 6);
-                AddEdge(2, 3, 4);
-                AddEdge(3, 4, 3);
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            if (adjacency[i, j] != null)
+                                weight_matrix[i, j].Add((int)adjacency[i, j]);
+                    break;
 
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        if (adjacency[i, j] != null)
-                            weight_matrix[i, j].Add((int)adjacency[i, j]);
-            }
-            else if (test4 == true)
-            {
-                Vertices = 6;
-                Edges = 27;
-                Oriented = true;
-                adjacency = new int?[Vertices, Vertices];
-                weight_matrix = new List<int>[Vertices, Vertices];
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        weight_matrix[i, j] = [];
+                case 3:
+                    Vertices = 5;
+                    Edges = 7;
+                    Oriented = false;
+                    adjacency = new int?[Vertices, Vertices];
+                    weight_matrix = new List<int>[Vertices, Vertices];
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            weight_matrix[i, j] = [];
 
-                AddEdge(0, 0, 0);
-                AddEdge(0, 1, 2, true);
-                AddEdge(0, 2, 7, true);
-                AddEdge(0, 3, 4);
-                AddEdge(0, 4, 6, true);
-                AddEdge(0, 5, 3, true);
-                AddEdge(1, 0, 3, true);
-                AddEdge(1, 1, 0);
-                AddEdge(1, 2, 4);
-                AddEdge(1, 3, 5, true);
-                AddEdge(1, 4, 6, true);
-                AddEdge(1, 5, 1, true);
-                AddEdge(2, 0, 2, true);
-                AddEdge(2, 1, 4, true);
-                AddEdge(2, 2, 0);
-                AddEdge(2, 3, 8);
-                AddEdge(2, 4, 7, true);
-                AddEdge(3, 0, 4);
-                AddEdge(3, 3, 0);
-                AddEdge(3, 4, 5, true);
-                AddEdge(3, 5, 7);
-                AddEdge(4, 1, 7, true);
-                AddEdge(4, 2, 8, true);
-                AddEdge(4, 3, 4, true);
-                AddEdge(4, 4, 0);
-                AddEdge(4, 5, 3, true);
-                AddEdge(5, 0, 2, true);
-                AddEdge(5, 1, 4, true);
-                AddEdge(5, 3, 7);
-                AddEdge(5, 4, 8, true);
-                AddEdge(5, 5, 0);
+                    AddEdge(0, 1, 25);
+                    AddEdge(0, 2, 15);
+                    AddEdge(0, 3, 7);
+                    AddEdge(0, 4, 2);
+                    AddEdge(1, 2, 6);
+                    AddEdge(2, 3, 4);
+                    AddEdge(3, 4, 3);
 
-                for (int i = 0; i < Vertices; i++)
-                    for (int j = 0; j < Vertices; j++)
-                        if (adjacency[i, j] != null)
-                            weight_matrix[i, j].Add((int)adjacency[i, j]);
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            if (adjacency[i, j] != null)
+                                weight_matrix[i, j].Add((int)adjacency[i, j]);
+                    break;
+
+                case 4:
+                    Vertices = 6;
+                    Edges = 27;
+                    Oriented = true;
+                    adjacency = new int?[Vertices, Vertices];
+                    weight_matrix = new List<int>[Vertices, Vertices];
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            weight_matrix[i, j] = [];
+
+                    AddEdge(0, 0, 0);
+                    AddEdge(0, 1, 2, true);
+                    AddEdge(0, 2, 7, true);
+                    AddEdge(0, 3, 4);
+                    AddEdge(0, 4, 6, true);
+                    AddEdge(0, 5, 3, true);
+                    AddEdge(1, 0, 3, true);
+                    AddEdge(1, 1, 0);
+                    AddEdge(1, 2, 4);
+                    AddEdge(1, 3, 5, true);
+                    AddEdge(1, 4, 6, true);
+                    AddEdge(1, 5, 1, true);
+                    AddEdge(2, 0, 2, true);
+                    AddEdge(2, 1, 4, true);
+                    AddEdge(2, 2, 0);
+                    AddEdge(2, 3, 8);
+                    AddEdge(2, 4, 7, true);
+                    AddEdge(3, 0, 4);
+                    AddEdge(3, 3, 0);
+                    AddEdge(3, 4, 5, true);
+                    AddEdge(3, 5, 7);
+                    AddEdge(4, 1, 7, true);
+                    AddEdge(4, 2, 8, true);
+                    AddEdge(4, 3, 4, true);
+                    AddEdge(4, 4, 0);
+                    AddEdge(4, 5, 3, true);
+                    AddEdge(5, 0, 2, true);
+                    AddEdge(5, 1, 4, true);
+                    AddEdge(5, 3, 7);
+                    AddEdge(5, 4, 8, true);
+                    AddEdge(5, 5, 0);
+
+                    for (int i = 0; i < Vertices; i++)
+                        for (int j = 0; j < Vertices; j++)
+                            if (adjacency[i, j] != null)
+                                weight_matrix[i, j].Add((int)adjacency[i, j]);
+                    break;
+
+                default:
+                    break;
             }
         }        
 
