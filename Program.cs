@@ -1,9 +1,5 @@
 ﻿using Complexity_theory_of_computing_processors_and_structures;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
+using System;
 
 internal partial class Program
 {
@@ -39,6 +35,7 @@ internal partial class Program
     #region Bubble
     static void BubbleSort(CustomArray array)
     {
+        bool swap = false;
         for (int i = 0; i < array.Columns; i++)
         {
             for (int j = 0; j < array.Columns - 1 - i; j++)
@@ -46,8 +43,13 @@ internal partial class Program
                 if (array[j] > array[j + 1])
                 {
                     (array[j], array[j + 1]) = (array[j + 1], array[j]);
+                    swap = true;
                 }
             }
+            if (swap)
+                swap = false;
+            else
+                break;
         }
 
         Console.WriteLine("\u2193");
@@ -56,11 +58,73 @@ internal partial class Program
     #endregion
 
     #region Merge
-    static void MergeSort(CustomArray array)
+    static void MergeSortNR(CustomArray array)
     {
-        int delete = CheckN(ref array);
-        Sort(ref array, 0, array.Columns - 1);
+        CustomArray temp_array = new(array.Columns);
+        int right, end;
+        int i, j, temp_index, num = array.Columns;
 
+        int delete = CheckN(ref array);
+        Console.WriteLine("\u2193");
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+
+        for (int k = 1; k < num; k *= 2)
+        {
+            Console.WriteLine($"k = {k}");
+            for (int l = 0; l < array.Columns; l++)
+            {
+                Console.Write($"{array[l]} ");
+                if ((l + 1) % k == 0) Console.Write(" | ");
+            }
+            Console.WriteLine();
+
+            for (int left = 0; left + k < num; left += k * 2)
+            {
+                right = left + k;
+                end = right + k;
+                temp_index = left; 
+                i = left; 
+                j = right;
+
+                if (end > num)
+                    end = num;
+
+                while (i < right && j < end)
+                {
+                    if (array[i] <= array[j])
+                    {
+                        temp_array[temp_index] = array[i]; 
+                        i++;
+                    }
+                    else
+                    {
+                        temp_array[temp_index] = array[j]; 
+                        j++;
+                    }
+                    temp_index++;
+                }
+
+                while (i < right)
+                {
+                    temp_array[temp_index] = array[i];
+                    i++; 
+                    temp_index++;
+                }
+                while (j < end)
+                {
+                    temp_array[temp_index] = array[j];
+                    j++; 
+                    temp_index++;
+                }
+
+                for (temp_index = left; temp_index < end; temp_index++)
+                {
+                    array[temp_index] = temp_array[temp_index];
+                }
+            }     
+        }
+
+        Console.ResetColor();
         Console.WriteLine("\u2193");
         array.PrintArray();
         if (delete != 0)
@@ -69,64 +133,8 @@ internal partial class Program
             array = CustomArray.ResizeArray(array, array.Columns - delete);
             array.PrintArray();
         }
-    }
-    static void Sort(ref CustomArray array, int left, int right)
-    {
-
-        if (left < right)
-        {
-            int middle = left + (right - left) / 2;
-            Sort(ref array, left, middle);
-            Sort(ref array, middle + 1, right);
-            Merge(ref array, left, middle, right);
-        }
-    }
-    static void Merge(ref CustomArray array, int left, int middle, int right)
-    {
-        int size1 = middle - left + 1;
-        int size2 = right - middle;
-        int i, j;
-        List<int> tempLeft = [];
-        List<int> tempRight = [];
-
-        for (i = 0; i < size1; i++)
-            tempLeft.Add(array[left + i]);
-        for (j = 0; j < size2; j++)
-            tempRight.Add(array[middle + 1 + j]);
-
-        i = 0; j = 0;
-        int k = left;
-
-        while (i < size1 && j < size2)
-        {
-            if (tempLeft[i] <= tempRight[j])
-            {
-                array[k] = tempLeft[i];
-                i++;
-            }
-            else
-            {
-                array[k] = tempRight[j];
-                j++;
-            }
-
-            k++;
-        }
-
-        while (i < size1)
-        {
-            array[k] = tempLeft[i];
-            i++;
-            k++;
-        }
-
-        while (j < size2)
-        {
-            array[k] = tempRight[j];
-            j++;
-            k++;
-        }
-    }
+    }    
+    
     static int CheckN(ref CustomArray array)
     {
         for (int i = 1; ; i++)
@@ -153,6 +161,7 @@ internal partial class Program
             }
         }
     }
+
     static int FindMax(ref CustomArray array)
     {
         int max = array[0];
@@ -274,7 +283,7 @@ internal partial class Program
     #region Backpack
     static void Backpack(CustomArray array, int limit)
     {        
-        int[] backpack = new int[limit + 1]; //стоимость для каждогов веса
+        int[] backpack = new int[limit + 1]; //стоимость для каждого веса
         List<int>[] items_sets = new List<int>[limit + 1]; //содержимое рюкзака
 
         backpack[0] = 0;
@@ -399,11 +408,11 @@ internal partial class Program
         }
 
         Console.WriteLine("Матрица смежности:");
-        graph.PrintGraph(9);
+        graph.PrintGraph(8);
         Console.WriteLine("\nМатрица смежности после применения алгоритма Флойда-Уоршелла:");
-        graph.PrintWeightMatrix(9);
+        graph.PrintWeightMatrix(8);
 
-        MakeTheWay(ref graph);
+        //MakeTheWay(ref graph);
     }
     #endregion
 
@@ -486,7 +495,7 @@ internal partial class Program
             has_edge = false;
             for (int i = 0; i < graph.Vertices; i++)
             {
-                if (!(i == 0 && j == 0)
+                if (!(i == 0 && j == 0) && (i < j)
                     && graph.weight_matrix[i, j].Count != 0 
                     && graph.weight_matrix[i, j][0] + prices[i][0] < prices[j][0])
                 {
@@ -989,7 +998,7 @@ internal partial class Program
 
                 case "3":
                     Console.WriteLine("MergeSort");
-                    MergeSort(PrepareArray());
+                    MergeSortNR(PrepareArray());
                     break;
 
                 case "4":

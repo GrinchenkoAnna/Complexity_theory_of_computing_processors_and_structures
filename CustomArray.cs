@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Complexity_theory_of_computing_processors_and_structures
+﻿namespace Complexity_theory_of_computing_processors_and_structures
 {
     class CustomArray
     {
