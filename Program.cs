@@ -626,35 +626,28 @@ internal partial class Program
                             graph.weight_matrix[v0, j].Add(chosen_vertex);
                         else if (graph.weight_matrix[v0, j].Count == 2)
                             graph.weight_matrix[v0, j][1] = chosen_vertex;
-                    }                    
-                }
 
-                if (!graph.Oriented)
-                {
-                    if (graph.weight_matrix[v0, chosen_vertex].Count
-                        * graph.weight_matrix[chosen_vertex, j].Count != 0)
-                    {
-                        if (D[j] > graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, v0][0])
+                        if (!graph.Oriented)
                         {
-                            D[j] = graph.weight_matrix[j, chosen_vertex][0] + graph.weight_matrix[chosen_vertex, v0][0];
                             if (graph.weight_matrix[j, v0].Count != 0)
                                 graph.weight_matrix[j, v0][0] = D[j];
                             else
                                 graph.weight_matrix[j, v0].Add(D[j]);
 
-                            if (graph.weight_matrix[v0, j].Count == 1)
-                                graph.weight_matrix[v0, j].Add(chosen_vertex);
-                            else if (graph.weight_matrix[v0, j].Count == 2)
-                                graph.weight_matrix[v0, j][1] = chosen_vertex;
-                        }                            
-                    }
-                }    
+                            if (graph.weight_matrix[j, v0].Count == 1)
+                                graph.weight_matrix[j, v0].Add(chosen_vertex);
+                            else if (graph.weight_matrix[j, v0].Count == 2)
+                                graph.weight_matrix[j, v0][1] = chosen_vertex;
+                        }
+                    }                    
+                }                  
             }
 
             V.Remove(chosen_vertex);
             iter--;
         }
         Console.WriteLine();
+        graph.PrintWeightMatrix();
 
         //пути        
         FindShortestPath(ref graph, v0, ref paths);

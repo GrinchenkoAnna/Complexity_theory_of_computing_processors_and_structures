@@ -167,9 +167,8 @@
                     AddEdge(2, 5, 2);
                     AddEdge(2, 6, 2);
                     AddEdge(3, 5, 3);
-                    AddEdge(3, 5, 4);
-                    AddEdge(3, 5, 4);
-                    AddEdge(4, 8, 5);
+                    AddEdge(3, 6, 4);
+                    AddEdge(4, 8, 2);
                     AddEdge(5, 7, 1);
                     AddEdge(5, 8, 1);
                     AddEdge(5, 9, 3);
